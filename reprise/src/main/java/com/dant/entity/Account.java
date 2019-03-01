@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by pitton on 2017-02-21.
  */
-public class Account implements Serializable {
+public class Account {
 
 	private String email;
 	private long updated;

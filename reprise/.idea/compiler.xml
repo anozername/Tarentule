@@ -9,5 +9,8 @@
         <module name="dant" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="dant" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

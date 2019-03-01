@@ -2,7 +2,7 @@ package com.dant.entity;
 
 import java.io.Serializable;
 
-public class Column implements Serializable {
+public class Column {
     private String name;
     private String type;
 

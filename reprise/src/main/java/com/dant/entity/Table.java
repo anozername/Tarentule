@@ -1,8 +1,9 @@
 package com.dant.entity;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
-public class Table implements Serializable {
+public class Table {
 
     private String name;
     private Column[] attributes;
@@ -10,6 +11,12 @@ public class Table implements Serializable {
     public Table(String name, Column[] attributes) {
         this.name = name;
         this.attributes = attributes;
+        this.index = new HashMap();
+    }
+
+    // a redeclarer pour les types usuels
+    public void setIndex(String attribute, Object value) {
+        this.index.put(findIndex(attribute), value);
     }
 
     public String getName() {
