@@ -1,5 +1,10 @@
 package com.dant.extraction;
 
+import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 public class SQLConnexion {
     private Connection conn;
 
