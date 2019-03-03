@@ -15,6 +15,15 @@ public class Table {
         this.index = new Index(keys);
     }
     
+    public Column findColumn(String name) {
+    	for (Column attribute : attributes) {
+    		if (attribute.getName().equals(name)) {
+    			return attribute;
+    		}
+    	}
+    	return null;
+    }
+    
     public String statementIndexSeed(Column attribute) {
     	return "SELECT id, " + attribute.getName() + " FROM " + name + " GROUP BY " + attribute.getName();
     }
@@ -26,6 +35,10 @@ public class Table {
 
     public String getName() {
         return name;
+    }
+    
+    public Index getIndex() {
+    	return index;
     }
 
     public void setName(String name) {

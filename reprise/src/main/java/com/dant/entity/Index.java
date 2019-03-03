@@ -10,6 +10,10 @@ public class Index {
         this.attributes = attributes;
     }
     
+    public Column[] getAttributes() {
+    	return attributes;
+    }
+    
   //TODO remplir les index avec un appel sql sur cols: get ResultSet 
 
     public void putValues(Column attribute, HashMapValues values) {
