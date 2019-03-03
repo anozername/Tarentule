@@ -17,6 +17,10 @@ public class Column {
     public String getType() {
         return type;
     }
+    
+    public boolean equals(Column c) {
+    	return this.name.equals(c.name);
+    }
 
     public void setType(String type) {
         this.type = type;

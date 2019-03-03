@@ -7,16 +7,21 @@ public class Table {
 
     private String name;
     private Column[] attributes;
+    private Index index;
 
-    public Table(String name, Column[] attributes) {
+    public Table(String name, Column[] attributes, Column[] keys) {
         this.name = name;
         this.attributes = attributes;
-        this.index = new HashMap();
+        this.index = new Index(keys);
+    }
+    
+    public String statementIndexSeed(Column attribute) {
+    	return "SELECT id, " + attribute.getName() + " FROM " + name + " GROUP BY " + attribute.getName();
     }
 
-    // a redeclarer pour les types usuels
-    public void setIndex(String attribute, Object value) {
-        this.index.put(findIndex(attribute), value);
+    //a redeclarer pour les types usuels
+    public void putIndex(Column attribute, HashMapValues values) {
+        this.index.putValues(attribute, values);
     }
 
     public String getName() {
@@ -45,15 +50,15 @@ public class Table {
     public String createTableString() {
         String sb = "CREATE TABLE " + name + " (";
         for (Column attribute : attributes) {
-            sb += attributes.toString() + ",";
+            sb += attribute.toString() + ",";
         }
         //enlever la derniere virgule
-        sb = sb.subString(0, sb.length-1);
+        sb = sb.substring(0, sb.length()-1);
         sb += ");";
         return sb;
     }
 
     public String insertTableString(String values) {
-        String sb = "INSERT INTO " + name + " VALUES (" + values + ");";
+        return "INSERT INTO " + name + " VALUES (" + values + ");";
     }
 }

@@ -4,11 +4,13 @@ import java.util.HashMap;
 
 public class Index {
     private Column[] attributes;
-    private HashMap hashmap = new HashMap();
+    private HashMap<String, HashMapValues> hashmap = new HashMap<String, HashMapValues>();
 
     public Index(Column[] attributes) {
         this.attributes = attributes;
     }
+    
+  //TODO remplir les index avec un appel sql sur cols: get ResultSet 
 
     public void putValues(Column attribute, HashMapValues values) {
         hashmap.put(attribute.getName(), values);
@@ -21,5 +23,6 @@ public class Index {
                 return i;
             }
         }
+        return -1;
     }
 }
