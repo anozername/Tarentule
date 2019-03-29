@@ -8,7 +8,7 @@ public class HashMapValues extends HashMap<Object, Integer[]> {
         super();
     }
 
-    public Integer[] put(int value, Integer[] ids) {
+    /*public Integer[] put(int value, Integer[] ids) {
         return this.put(value, ids);
     }
  
@@ -22,5 +22,13 @@ public class HashMapValues extends HashMap<Object, Integer[]> {
     
     public Integer[] put(Date value, Integer[] ids) {
         return this.put(value, ids);
+    }*/
+
+    public Object[] put(Object value, Object[] ids) {
+        return this.put(value, ids);
+    }
+
+    public boolean hasValue(Object value) {
+        return this.containsKey(value);
     }
 }
