@@ -2,7 +2,7 @@ package com.dant.entity;
 
 public class Trip {
 
-    private vendor_id
+    /*private vendor_id
 
     pickup_datetime
     dropoff_datetime
@@ -22,6 +22,6 @@ public class Trip {
     mta_tax
     tip_amount
     tolls_amount
-    total_amount
+    total_amount */
 
 }

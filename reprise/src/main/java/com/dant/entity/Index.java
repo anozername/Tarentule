@@ -16,7 +16,18 @@ public class Index {
     public Lines getLines() {
     	return lines;
     }
-
+    
+    public HashMap<String, HashMapValues> getHashmap() {
+    	return hashmap;
+    }
+    
+    /********************************************************		helpers		*/
+    
+    public HashMapValues findInHashMap(String attribute) {
+    	return hashmap.get(attribute);
+    }
+    
+    /* for insert : find the ids that correspond to value in lines[index] */
     public Object[] findID(int index, Object value) {
         ArrayList<Object> ids = new ArrayList<Object>();
         for (Object[] line : lines) {
@@ -27,7 +38,9 @@ public class Index {
         return ids.toArray();
     }
 
-
+    /********************************************************		insert		*/
+    
+    /* trouver equivalence mapreduce ? */
     public void putValues(Lines lines) {
         HashMapValues values = new HashMapValues();
         for (int index : lines.getPosIndex()) {
@@ -39,25 +52,28 @@ public class Index {
             hashmap.put(lines.getNameIndex()[index], values);
         }
     }
+    
+    /********************************************************		find		*/
 
     public List<Object[]> get(String key) {
-        if(hashmap.containsKey(key)) {
-            return getValueWithoutIndex(key);
+        if(hashmap.containsKey(key)) { //ou regarder dans lines.nameindex...
+            //return getValueWithoutIndex(key);
         }
         return getValueWithIndex(key);
     }
 
-    public List<Object[]> getValueWithIndex(String key){
-        HashMapValues hashmapvalues = new HashMapValues();
-        Integer[] res;
+    /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
+    public List<Object[]> getValueWithIndex(String key) {
+        HashMapValues hashmapvalues = findInHashMap(key);
+        List<Object[]> res = new ArrayList<Object[]>();
         for (Integer[] ids : hashmapvalues.values()) {
-            //res = (Integer[])ArrayUtils.addAll(res, ids);
-
+            res.addAll(lines.getLines(ids));
         }
-
+        return res;
     }
-
-
+    
+    /* @TODO find lines without index
+     * 
     public List<Object[]> getValueWithoutIndex(String key){
         List<Object[]> res = new //TODO
         for(Object[] line : lines){
@@ -66,6 +82,18 @@ public class Index {
             }
         }
         return res;
+    }
+    */
+    
+    /********************************************************		print		*/
+    
+    public void printResults(List<Object[]> result) {
+    	for (Object[] res : result) {
+    		for (Object e : res) {
+    			System.out.println(e.toString() + " ");
+    		}
+    		System.out.println("\n");
+    	}
     }
 
 }
