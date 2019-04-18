@@ -14,6 +14,14 @@ public class Lines extends ArrayList<Object[]>{
         this.nameIndex = nameIndex;
     }
 
+    public Lines(int posID, int[] posIndex, String[] nameIndex, Collection<Object[]> list) {
+        super();
+        this.addAll(list);
+        this.posID = posID;
+        this.posIndex = posIndex;
+        this.nameIndex = nameIndex;
+    }
+
     public int getPosID() {
         return posID;
     }
