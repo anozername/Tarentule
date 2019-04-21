@@ -1,4 +1,3 @@
-
 package com.dant.entity;
 
 import java.util.*;
