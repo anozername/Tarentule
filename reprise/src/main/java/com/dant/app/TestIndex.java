@@ -1,6 +1,6 @@
 package com.dant.app;
 
-import com.dant.entity.Account;
+import com.dant.entity.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.io.File;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -28,9 +29,9 @@ public class TestIndex {
         CsvSchema csvSchema = CsvSchema.builder().setUseHeader(true).build();
         CsvMapper csvMapper = new CsvMapper();
 
+       // ObjectMapper mapper2 = new ObjectMapper();
         // Read data from CSV file
         List<Object> readAll = csvMapper.readerFor(Map.class).with(csvSchema).readValues(input).readAll();
-
         ObjectMapper mapper = new ObjectMapper();
 
         // Write JSON formated data to output.json file
@@ -39,15 +40,24 @@ public class TestIndex {
         // Write JSON formated data to stdout
         //System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll));
 
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
+        //List<Map<String, Object>> readlines = mapper2.readValue(output, new TypeReference<List<Map<String, Object>>>(){} );
+
+        return readAll.toString();
     }
 
-    @POST
-    @Path("/entity")
-    public Account getAccount(Account account) {
-        System.out.println("Received account " + account);
-        account.setUpdated(System.currentTimeMillis());
-        return account;
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/insert")
+    public String getIndex() {
+        List<Object[]> content = CSVReader.readLines();
+
+        //definir ici les index
+        int[] defineIndex = {3};
+        Object[] attributes = content.remove(0);
+        Lines lines = new Lines(defineIndex, attributes, content);
+        Index index = new Index(lines);
+        index.putValues();
+        return index.get("passenger_count").toString();
     }
 
     @GET

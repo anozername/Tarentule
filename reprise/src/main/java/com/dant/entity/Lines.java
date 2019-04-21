@@ -3,34 +3,27 @@ package com.dant.entity;
 import java.util.*;
 
 public class Lines extends ArrayList<Object[]>{
-    private int posID;
     private int[] posIndex;
-    private String[] nameIndex;
+    private Object[] nameIndex;
 
-    public Lines(int posID, int[] posIndex, String[] nameIndex) {
+    public Lines(int[] posIndex, Object[] nameIndex) {
         super();
-        this.posID = posID;
         this.posIndex = posIndex;
         this.nameIndex = nameIndex;
     }
 
-    public Lines(int posID, int[] posIndex, String[] nameIndex, Collection<Object[]> list) {
+    public Lines(int[] posIndex, Object[] nameIndex, List<Object[]> list) {
         super();
         this.addAll(list);
-        this.posID = posID;
         this.posIndex = posIndex;
         this.nameIndex = nameIndex;
-    }
-
-    public int getPosID() {
-        return posID;
     }
 
     public int[] getPosIndex() {
         return posIndex;
     }
 
-    public String[] getNameIndex() {
+    public Object[] getNameIndex() {
         return nameIndex;
     }
     
@@ -42,17 +35,15 @@ public class Lines extends ArrayList<Object[]>{
     
     /********************************************************		find		*/
     
-    /* return lines matching the ids TODO: EFFICIENT SEARCH (dichotomie?) */
-    public ArrayList<Object[]> getLines(Integer[] ids) {
+    /* return lines matching the ids */
+    public ArrayList<Object[]> getLines(ArrayList<Integer> ids) {
     	ArrayList<Object[]> res = new ArrayList<Object[]>();
-    	for (Object[] line : this) {
-    		if (Arrays.binarySearch(ids, line[posID]) != -1) {
-    			res.add(line);
-    		}
-    	}
-    	return res;
+        for (Integer i : ids) {
+            res.add(get(i));
+        }
+        return res;
     }
-    
+
     public ArrayList<Object[]> getLines(int pos, Object value) {
     	ArrayList<Object[]> res = new ArrayList<Object[]>();
     	for (Object[] line : this) {
@@ -61,6 +52,20 @@ public class Lines extends ArrayList<Object[]>{
     		}
     	}
     	return res;
+    }
+
+    /********************************************************		print		*/
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        for (Object[] line : this) {
+            sb.append("[");
+            for (Object e : line) {
+                sb.append(e.toString() + ", ");
+            }
+            sb.append("]\n");
+        }
+        return sb.toString();
     }
     
 }

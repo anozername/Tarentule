@@ -25,30 +25,29 @@ public class Index {
     public HashMapValues findInHashMap(String attribute) {
     	return hashmap.get(attribute);
     }
-    
-    /* for insert : find the ids that correspond to value in lines[index] */
-    public Object[] findID(int index, Object value) {
-        ArrayList<Object> ids = new ArrayList<Object>();
-        for (Object[] line : lines) {
-            if (line[index].equals(value)) {
-                ids.add(line[lines.getPosID()]);
-            }
-        }
-        return ids.toArray();
-    }
 
     /********************************************************		insert		*/
-    
-    /* trouver equivalence mapreduce ? */
-    public void putValues(Lines lines) {
+
+    public void putValues() {
         HashMapValues values = new HashMapValues();
+        ArrayList<Integer> ids;
+        int id = 0;
         for (int index : lines.getPosIndex()) {
             for (Object[] line : lines) {
-                if (!values.hasValue(line[index])) {
-                    values.put(line[index], findID(index, line[index]));
+                if (values.hasValue(line[index])) {
+                    ids = values.get(line[index]);
+                    ids.add(id);
+                    values.replace(line[index], ids);
                 }
+                else {
+                    ids = new ArrayList<Integer>();
+                    ids.add(id);
+                    //nouvelle valeur a chaque fois
+                    values.put(line[index], ids);
+                }
+                id++;
             }
-            hashmap.put(lines.getNameIndex()[index], values);
+            hashmap.put((String)lines.getNameIndex()[index], values);
         }
     }
     
@@ -56,6 +55,7 @@ public class Index {
 
     public List<Object[]> get(String key) {
         if(hashmap.containsKey(key)) { //ou regarder dans lines.nameindex...
+            return getValueWithIndex(key);
             //return getValueWithoutIndex(key);
         }
         return getValueWithIndex(key);
@@ -64,8 +64,8 @@ public class Index {
     /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
     public List<Object[]> getValueWithIndex(String key) {
         HashMapValues hashmapvalues = findInHashMap(key);
-        List<Object[]> res = new ArrayList<Object[]>();
-        for (Integer[] ids : hashmapvalues.values()) {
+        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        for (ArrayList<Integer> ids : hashmapvalues.values()) {
             res.addAll(lines.getLines(ids));
         }
         return res;

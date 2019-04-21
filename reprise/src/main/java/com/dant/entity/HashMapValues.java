@@ -2,8 +2,9 @@ package com.dant.entity;
 
 import java.util.HashMap;
 import java.util.Date;
+import java.util.*;
 
-public class HashMapValues extends HashMap<Object, Integer[]> {
+public class HashMapValues extends HashMap<Object, ArrayList<Integer>> {
     public HashMapValues() {
         super();
     }
@@ -24,8 +25,22 @@ public class HashMapValues extends HashMap<Object, Integer[]> {
         return this.put(value, ids);
     }*/
 
-    public Object[] put(Object value, Object[] ids) {
+    public ArrayList<Integer> put(Object value, ArrayList<Integer> ids) {
         return this.put(value, ids);
+    }
+
+    @Override
+    //marche pas
+    public boolean containsKey(Object key) {
+        String s = (String)key;
+        String so;
+        s.replaceAll("\\s","");
+        for (Object o : this.keySet()) {
+            so = (String)o;
+            so.replaceAll("\\s","");
+            if (s.equals(so)) return true;
+        }
+        return false;
     }
 
     public boolean hasValue(Object value) {
