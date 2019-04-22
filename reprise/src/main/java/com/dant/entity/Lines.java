@@ -27,6 +27,15 @@ public class Lines extends ArrayList<Object[]>{
     public Object[] getNameIndex() {
         return nameIndex;
     }
+
+    public int getPosNameIndex(Object name) {
+        for (int i=0; i<nameIndex.length; i++) {
+            if (name.equals(nameIndex[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
     
     /********************************************************		insert		*/
     

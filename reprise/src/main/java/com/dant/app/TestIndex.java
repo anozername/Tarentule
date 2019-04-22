@@ -3,23 +3,28 @@ package com.dant.app;
 import com.dant.entity.*;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.io.File;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-
-import java.util.*;
 
 @Path("/index/test")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TestIndex {
+
+    private static Index index;
+    private static Lines lines;
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -49,32 +54,86 @@ public class TestIndex {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
-    public String getIndex() {
+    public String insert() {
         List<Object[]> content = CSVReader.readLines();
 
         //definir ici les index
         int[] defineIndex = {3};
         Object[] attributes = content.remove(0);
-        Lines lines = new Lines(defineIndex, attributes, content);
-        Index index = new Index(lines);
+        lines = new Lines(defineIndex, attributes, content);
+        index = new Index(lines);
         index.putValues();
+        return "insertion ok";
+    }
 
-        /*List<Object[]> res = index.get("passenger_count");
-        List<String[]> cast = new ArrayList<String[]>();
-        int acc=0;
-        String[]
-        for (Object[] l : res) {
-            for (Object o : l) {
-                cast.add();
-            }
-        }*/
-        return index.get("passenger_count").toString();
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/find")
+    public String getIndex(@Context UriInfo uriInfo) {
+        Lines tmp;
+        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+        for (String cmd : queryParams.keySet()) {
+            index.setLines(parser(cmd, queryParams.get(cmd).get(0)));
+        }
+        tmp = index.getLines();
+        index.setLines(lines);
+        return tmp.toString();
     }
 
     @GET
     @Path("/exception")
     public Response exception() {
         throw new RuntimeException("oups...");
+    }
+
+    public static Lines parser(String cmd, String value) {
+        switch (cmd) {
+            case "vendor_id":
+                return (index.get("vendor_id", value));
+            case "pickup_datetime":
+                try {
+                        return (index.get("pickup_datetime", sdf.parse(value)));
+                }
+                catch (Exception e) {
+                    return null;
+                }
+            case "dropoff_datetime":
+                try {
+                        return (index.get("dropoff_datetime", sdf.parse(value)));
+                }
+                catch (Exception e) {
+                    return null;
+                }
+            case "passenger_count":
+                return (index.get("passenger_count", Integer.parseInt(value)));
+            case "trip_distance":
+                return (index.get("trip_distance", Double.parseDouble(value)));
+            case "pickup_longitude":
+                return (index.get("pickup_longitude", Double.parseDouble(value)));
+            case "pickup_latitude":
+                return (index.get("pickup_latitude", Double.parseDouble(value)));
+            case "rate_code":
+                return (index.get("rate_code", Integer.parseInt(value)));
+            case "store_and_fwd_flag":
+                return (index.get("store_and_fwd_flag", value));
+            case "dropoff_longitude":
+                return (index.get("dropoff_longitude", Double.parseDouble(value)));
+            case "dropoff_latitude":
+                return (index.get("dropoff_latitude", Double.parseDouble(value)));
+            case "payment_type":
+                return (index.get("payment_type", value));
+            case "surcharge":
+                return (index.get("surcharge", Integer.parseInt(value)));
+            case "mta_tax":
+                return (index.get("mta_tax", Double.parseDouble(value)));
+            case "tip_amount":
+                return (index.get("tip_amount", Double.parseDouble(value)));
+            case "tolls_amount":
+                return (index.get("tolls_amount", Double.parseDouble(value)));
+            case "total_amount":
+                return (index.get("total_amount", Double.parseDouble(value)));
+        }
+        return null;
     }
 
 }

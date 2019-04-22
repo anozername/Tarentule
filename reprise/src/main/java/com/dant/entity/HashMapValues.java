@@ -29,6 +29,14 @@ public class HashMapValues extends HashMap<Object, ArrayList<Integer>> {
         return this.put(value, ids);
     }*/
 
+    public ArrayList<Integer> findInHashMapValues(Object key) {
+        for (Object val : keySet()) {
+            if (val.equals(key)) {
+                return get(val);
+            }
+        }
+        return null;
+    }
 
     public boolean hasValue(Object value) {
         return this.containsKey(value);

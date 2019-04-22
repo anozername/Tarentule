@@ -60,18 +60,18 @@ public class CSVReader {
                     }
                 }
 
-                for (Integer i : posDouble) {
+                for (Integer i : posInteger) {
                     try {
-                        l.set(i,  Double.parseDouble(trip[i].toString()));
+                        l.set(i, Integer.parseInt(trip[i].toString()));
                     }
                     catch (Exception e) {
                         //faire un truc mais en meme temps la position est connue en avance
                     }
                 }
 
-                for (Integer i : posInteger) {
+                for (Integer i : posDouble) {
                     try {
-                        l.set(i, Integer.parseInt(trip[i].toString()));
+                        l.set(i,  Double.parseDouble(trip[i].toString()));
                     }
                     catch (Exception e) {
                         //faire un truc mais en meme temps la position est connue en avance

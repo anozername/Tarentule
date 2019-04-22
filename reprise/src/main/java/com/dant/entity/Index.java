@@ -19,6 +19,10 @@ public class Index {
     public HashMap<String, HashMapValues> getHashmap() {
     	return hashmap;
     }
+
+    public void setLines(Lines lines) {
+        this.lines = lines;
+    }
     
     /********************************************************		helpers		*/
     
@@ -54,11 +58,17 @@ public class Index {
     /********************************************************		find		*/
 
     public Lines get(String key) {
-        if(hashmap.containsKey(key)) { //ou regarder dans lines.nameindex...
+        if(hashmap.containsKey(key)) {
             return getValueWithIndex(key);
-            //return getValueWithoutIndex(key);
         }
-        return getValueWithIndex(key);
+        return getValueWithoutIndex(key);
+    }
+
+    public Lines get(String key, Object value) {
+        if(hashmap.containsKey(key)) {
+            return getValueWithIndex(key, value);
+        }
+        return getValueWithoutIndex(key, value);
     }
 
     /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
@@ -70,19 +80,26 @@ public class Index {
         }
         return new Lines(null, null, res);
     }
-    
-    /* @TODO find lines without index
-     * 
-    public List<Object[]> getValueWithoutIndex(String key){
-        List<Object[]> res = new //TODO
-        for(Object[] line : lines){
-            if (line[0].equals(key)){
+
+    public Lines getValueWithIndex(String key, Object value) {
+        ArrayList<Integer> ids = findInHashMap(key).findInHashMapValues(value);
+        return new Lines(null, null, lines.getLines(ids));
+    }
+
+    public Lines getValueWithoutIndex(String key){
+        return lines;
+    }
+
+    public Lines getValueWithoutIndex(String key, Object value){
+        int pos = lines.getPosNameIndex(key);
+        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        for (Object[] line : lines) {
+            if (line[pos].equals(value)) {
                 res.add(line);
             }
         }
-        return res;
+        return new Lines(null, null, res);
     }
-    */
     
     /********************************************************		print		*/
     
