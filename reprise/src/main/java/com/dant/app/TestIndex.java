@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
+import java.util.*;
 
 @Path("/index/test")
 @Produces(MediaType.APPLICATION_JSON)
@@ -57,6 +58,16 @@ public class TestIndex {
         Lines lines = new Lines(defineIndex, attributes, content);
         Index index = new Index(lines);
         index.putValues();
+
+        /*List<Object[]> res = index.get("passenger_count");
+        List<String[]> cast = new ArrayList<String[]>();
+        int acc=0;
+        String[]
+        for (Object[] l : res) {
+            for (Object o : l) {
+                cast.add();
+            }
+        }*/
         return index.get("passenger_count").toString();
     }
 

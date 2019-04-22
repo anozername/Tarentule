@@ -1,5 +1,6 @@
 package com.dant.entity;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Lines extends ArrayList<Object[]>{
@@ -61,7 +62,7 @@ public class Lines extends ArrayList<Object[]>{
         for (Object[] line : this) {
             sb.append("[");
             for (Object e : line) {
-                sb.append(e.toString() + ", ");
+                sb.append(e.getClass() + ", ");
             }
             sb.append("]\n");
         }

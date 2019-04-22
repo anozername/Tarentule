@@ -53,7 +53,7 @@ public class Index {
     
     /********************************************************		find		*/
 
-    public List<Object[]> get(String key) {
+    public Lines get(String key) {
         if(hashmap.containsKey(key)) { //ou regarder dans lines.nameindex...
             return getValueWithIndex(key);
             //return getValueWithoutIndex(key);
@@ -62,13 +62,13 @@ public class Index {
     }
 
     /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
-    public List<Object[]> getValueWithIndex(String key) {
+    public Lines getValueWithIndex(String key) {
         HashMapValues hashmapvalues = findInHashMap(key);
         ArrayList<Object[]> res = new ArrayList<Object[]>();
         for (ArrayList<Integer> ids : hashmapvalues.values()) {
             res.addAll(lines.getLines(ids));
         }
-        return res;
+        return new Lines(null, null, res);
     }
     
     /* @TODO find lines without index
