@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -18,13 +19,16 @@ public class CSVReader {
         String line = "";
         String cvsSplitBy = ",";
         List<Object[]> res = new ArrayList<Object[]>();
-        List<Object> l;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            ArrayList<Object> tmp = new ArrayList<>();
+            List<Object> tmp;
+            Integer id = 0;
 
             line = br.readLine();
             Object[] trip = line.split(cvsSplitBy);
-            res.add(trip);
+            tmp = new ArrayList<>(Arrays.asList(trip));
+            tmp.add(0, "id");
+            res.add(tmp.toArray());
+            //tmp.clear();
 
            /* pourrait servir au cas ou on decide de lire tous les csv
                la deuxieme ligne servirait alors a determiner les index des types parsables */
@@ -32,17 +36,20 @@ public class CSVReader {
             if ((line = br.readLine()) != null) {
 
                 trip = line.split(cvsSplitBy);
+                tmp = new ArrayList<>(Arrays.asList(trip));
+                tmp.add(0, id);
                 for (int i=0; i<trip.length; i++) {
                     tmp.add(casting(trip[i].toString(), i));
                 }
                 res.add(tmp.toArray());
+                tmp.clear();
+                id++;
             }
 
             while ((line = br.readLine()) != null) {
 
                 trip = line.split(cvsSplitBy);
-                res.add(trip);
-                l = new ArrayList<Object>(Arrays.asList(trip));
+                tmp = new ArrayList<>(Arrays.asList(trip));
 
                 /*  dans le csv actuel:
                     3 7 13 15 16: pos integer value
@@ -53,7 +60,7 @@ public class CSVReader {
                 //l.set(3, Integer.parseInt(trip[3].toString()));
                 for (Integer i : posDateTime) {
                     try {
-                        l.set(i, sdf.parse(trip[i].toString()));
+                        tmp.set(i, sdf.parse(trip[i].toString()));
                     }
                     catch (Exception e) {
                         //faire un truc mais en meme temps la position est connue en avance
@@ -62,7 +69,7 @@ public class CSVReader {
 
                 for (Integer i : posInteger) {
                     try {
-                        l.set(i, Integer.parseInt(trip[i].toString()));
+                        tmp.set(i, Integer.parseInt(trip[i].toString()));
                     }
                     catch (Exception e) {
                         //faire un truc mais en meme temps la position est connue en avance
@@ -71,14 +78,17 @@ public class CSVReader {
 
                 for (Integer i : posDouble) {
                     try {
-                        l.set(i,  Double.parseDouble(trip[i].toString()));
+                        tmp.set(i,  Double.parseDouble(trip[i].toString()));
                     }
                     catch (Exception e) {
                         //faire un truc mais en meme temps la position est connue en avance
                     }
                 }
+                tmp.add(0, id);
 
-                res.set(res.size()-1, l.toArray());
+                res.add(tmp.toArray());
+                tmp.clear();
+                id++;
             }
 
 

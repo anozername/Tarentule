@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Lines extends ArrayList<Object[]>{
+    private int posID = 0;
     private int[] posIndex;
     private Object[] nameIndex;
 
@@ -22,6 +23,10 @@ public class Lines extends ArrayList<Object[]>{
 
     public int[] getPosIndex() {
         return posIndex;
+    }
+
+    public int getPosID() {
+        return posID;
     }
 
     public Object[] getNameIndex() {
@@ -46,12 +51,12 @@ public class Lines extends ArrayList<Object[]>{
     /********************************************************		find		*/
     
     /* return lines matching the ids */
-    public ArrayList<Object[]> getLines(ArrayList<Integer> ids) {
+    public Lines getLines(List<Integer> ids) {
     	ArrayList<Object[]> res = new ArrayList<Object[]>();
         for (Integer i : ids) {
             res.add(get(i));
         }
-        return res;
+        return new Lines(null,null, res);
     }
 
     public ArrayList<Object[]> getLines(int pos, Object value) {
@@ -71,7 +76,7 @@ public class Lines extends ArrayList<Object[]>{
         for (Object[] line : this) {
             sb.append("[");
             for (Object e : line) {
-                sb.append(e.getClass() + ", ");
+                sb.append(e.toString() + ", ");
             }
             sb.append("]\n");
         }

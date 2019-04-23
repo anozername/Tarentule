@@ -57,14 +57,16 @@ public class Index {
     
     /********************************************************		find		*/
 
-    public Lines get(String key) {
+    //@TODO renvoyer une List ids pour queries et puis recherche de lines avec ids
+
+    public List<Integer> get(String key) {
         if(hashmap.containsKey(key)) {
             return getValueWithIndex(key);
         }
         return getValueWithoutIndex(key);
     }
 
-    public Lines get(String key, Object value) {
+    public List<Integer> get(String key, Object value) {
         if(hashmap.containsKey(key)) {
             return getValueWithIndex(key, value);
         }
@@ -72,33 +74,36 @@ public class Index {
     }
 
     /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
-    public Lines getValueWithIndex(String key) {
+    public List<Integer> getValueWithIndex(String key) {
         HashMapValues hashmapvalues = findInHashMap(key);
-        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        List<Integer> res = new ArrayList<>();
         for (ArrayList<Integer> ids : hashmapvalues.values()) {
-            res.addAll(lines.getLines(ids));
+            res.addAll(ids);
         }
-        return new Lines(null, null, res);
+        return res;
     }
 
-    public Lines getValueWithIndex(String key, Object value) {
-        ArrayList<Integer> ids = findInHashMap(key).findInHashMapValues(value);
-        return new Lines(null, null, lines.getLines(ids));
+    public List<Integer> getValueWithIndex(String key, Object value) {
+        return findInHashMap(key).findInHashMapValues(value);
     }
 
-    public Lines getValueWithoutIndex(String key){
-        return lines;
+    public List<Integer> getValueWithoutIndex(String key){
+        List<Integer> res = new ArrayList<>();
+        for (int i=0; i<lines.size(); i++) {
+            res.add(i);
+        }
+        return res;
     }
 
-    public Lines getValueWithoutIndex(String key, Object value){
+    public List<Integer> getValueWithoutIndex(String key, Object value){
         int pos = lines.getPosNameIndex(key);
-        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        List<Integer> res = new ArrayList<>();
         for (Object[] line : lines) {
             if (line[pos].equals(value)) {
-                res.add(line);
+                res.add((Integer)line[lines.getPosID()]);
             }
         }
-        return new Lines(null, null, res);
+        return res;
     }
     
     /********************************************************		print		*/

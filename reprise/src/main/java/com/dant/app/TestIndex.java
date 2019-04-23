@@ -9,6 +9,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
     public String insert() {
-        List<Object[]> content = CSVReader.readLines();
+       /* List<Object[]> content = CSVReader.readLines();
 
         //definir ici les index
         int[] defineIndex = {3};
@@ -63,22 +64,28 @@ public class TestIndex {
         lines = new Lines(defineIndex, attributes, content);
         index = new Index(lines);
         index.putValues();
-        return "insertion ok";
+        return index.getLines().toString();*/
+       return "pas insert car developpement";
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
-        Lines tmp;
+        insertion_test();
+        List<Integer> tmp = new ArrayList<>();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        for (String cmd : queryParams.keySet()) {
-            index.setLines(parser(cmd, queryParams.get(cmd).get(0)));
+        for (Map.Entry<String,List<String>> query : queryParams.entrySet()) {
+            if (!tmp.isEmpty()) {
+                tmp = computeResults(tmp, parser(query.getKey(), query.getValue().get(0)));
+            }
+            else {
+                tmp = parser(query.getKey(), query.getValue().get(0));
+            }
         }
-        tmp = index.getLines();
-        index.setLines(lines);
-        return tmp.toString();
+        return lines.getLines(tmp).toString();
     }
+
 
     @GET
     @Path("/exception")
@@ -86,7 +93,7 @@ public class TestIndex {
         throw new RuntimeException("oups...");
     }
 
-    public static Lines parser(String cmd, String value) {
+    public static List<Integer> parser(String cmd, String value) {
         switch (cmd) {
             case "vendor_id":
                 return (index.get("vendor_id", value));
@@ -134,6 +141,30 @@ public class TestIndex {
                 return (index.get("total_amount", Double.parseDouble(value)));
         }
         return null;
+    }
+
+    /********************************************************		helpers		*/
+
+    public void insertion_test() {
+        List<Object[]> content = CSVReader.readLines();
+        int[] defineIndex = {3};
+        Object[] attributes = content.remove(0);
+        lines = new Lines(defineIndex, attributes, content);
+        index = new Index(lines);
+        index.putValues();
+    }
+
+    public static List<Integer> computeResults(List<Integer> res_querie1, List<Integer> res_querie2)  {
+        List<Integer> tmp = new ArrayList<>();
+        for (int iq1 : res_querie1) {
+            for (int iq2 : res_querie2) {
+                if (iq1 == iq2) {
+                    tmp.add(iq1);
+                    break;
+                }
+            }
+        }
+        return tmp;
     }
 
 }
