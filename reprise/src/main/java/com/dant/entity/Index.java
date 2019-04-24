@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class Index {
 
     private Lines lines;
-    private HashMap<String, HashMapValues> hashmap = new HashMap<String, HashMapValues>();
+    private static final HashMap<String, HashMapValues> hashmap = new HashMap<String, HashMapValues>();
 
     public Index(Lines lines) {
         this.lines = lines;
@@ -21,7 +21,7 @@ public class Index {
     }
 
     public void setLines(Lines lines) {
-        this.lines = new Lines(null, null, lines, null);
+        this.lines = lines;
     }
     
     /********************************************************		helpers		*/

@@ -75,18 +75,20 @@ public class TestIndex {
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
         //insertion_test();
+        int acc = 0;
         List<Integer> tmp = new ArrayList<>();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         for (Map.Entry<String,List<String>> query : queryParams.entrySet()) {
-            if (!tmp.isEmpty()) {
+            acc++;
+            if (acc != 1) {
                 tmp = computeResults(tmp, parser(query.getKey(), query.getValue().get(0)));
             }
             else {
                 tmp = parser(query.getKey(), query.getValue().get(0));
             }
-            //index.setLines(lines.getLines(tmp));
+            index.setLines(lines.getLines(tmp));
         }
-        //index.setLines(lines);
+        index.setLines(lines);
         return index.getLines().getLines(tmp).toString();
     }
 
