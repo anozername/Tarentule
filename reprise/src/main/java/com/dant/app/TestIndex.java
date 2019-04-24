@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -56,23 +57,24 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
     public String insert() {
-       /* List<Object[]> content = CSVReader.readLines();
+        List<Object[]> content = CSVReader.readLines();
 
         //definir ici les index
         int[] defineIndex = {3};
         Object[] attributes = content.remove(0);
-        lines = new Lines(defineIndex, attributes, content);
+        Object[] types = content.get(content.size()-1);
+        lines = new Lines(defineIndex, attributes, content, types);
         index = new Index(lines);
         index.putValues();
-        return index.getLines().toString();*/
-       return "pas insert car developpement";
+        return "insertion ok";
+       //return "pas insert car developpement";
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
-        insertion_test();
+        //insertion_test();
         List<Integer> tmp = new ArrayList<>();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         for (Map.Entry<String,List<String>> query : queryParams.entrySet()) {
@@ -82,8 +84,10 @@ public class TestIndex {
             else {
                 tmp = parser(query.getKey(), query.getValue().get(0));
             }
+            //index.setLines(lines.getLines(tmp));
         }
-        return lines.getLines(tmp).toString();
+        //index.setLines(lines);
+        return index.getLines().getLines(tmp).toString();
     }
 
 
@@ -94,7 +98,35 @@ public class TestIndex {
     }
 
     public static List<Integer> parser(String cmd, String value) {
-        switch (cmd) {
+        Object[] attributes = index.getLines().getNameIndex();
+        for (int i=0; i<attributes.length; i++) {
+            if (cmd.equals(attributes[i].toString())) {
+                switch (index.getLines().getTypes()[i].toString()) {
+                    case "date":
+                        try {
+                            return (index.get(cmd, sdf.parse(value)));
+                        }
+                        catch (Exception e) {
+                            return null;
+                        }
+                    case "double":
+                        Optional<Integer> it = CastHelper.castToInteger(value);
+                        if (it.isPresent()) return (index.get(cmd, it.get()));
+                        return (index.get(cmd, Double.parseDouble(value)));
+
+                    case "string":
+                        return (index.get(cmd, value));
+                    default:
+                        return new ArrayList<>();
+                }
+            }
+        }
+        return null;
+
+
+       /* pourrait servir mais pas generique
+
+       switch (cmd) {
             case "vendor_id":
                 return (index.get("vendor_id", value));
             case "pickup_datetime":
@@ -141,6 +173,8 @@ public class TestIndex {
                 return (index.get("total_amount", Double.parseDouble(value)));
         }
         return null;
+        *
+        */
     }
 
     /********************************************************		helpers		*/
@@ -149,7 +183,8 @@ public class TestIndex {
         List<Object[]> content = CSVReader.readLines();
         int[] defineIndex = {3};
         Object[] attributes = content.remove(0);
-        lines = new Lines(defineIndex, attributes, content);
+        Object[] types = content.remove(content.size()-1);
+        Lines lines = new Lines(defineIndex, attributes, content, types);
         index = new Index(lines);
         index.putValues();
     }

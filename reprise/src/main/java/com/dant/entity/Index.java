@@ -21,7 +21,7 @@ public class Index {
     }
 
     public void setLines(Lines lines) {
-        this.lines = lines;
+        this.lines = new Lines(null, null, lines, null);
     }
     
     /********************************************************		helpers		*/

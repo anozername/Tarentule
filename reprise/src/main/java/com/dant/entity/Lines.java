@@ -6,19 +6,22 @@ import java.util.*;
 public class Lines extends ArrayList<Object[]>{
     private int posID = 0;
     private int[] posIndex;
-    private Object[] nameIndex;
+    private final Object[] nameIndex;
+    private final Object[] types;
 
-    public Lines(int[] posIndex, Object[] nameIndex) {
+    public Lines(int[] posIndex, Object[] nameIndex, Object[] types) {
         super();
         this.posIndex = posIndex;
         this.nameIndex = nameIndex;
+        this.types = types;
     }
 
-    public Lines(int[] posIndex, Object[] nameIndex, List<Object[]> list) {
+    public Lines(int[] posIndex, Object[] nameIndex, List<Object[]> list, Object[] types) {
         super();
         this.addAll(list);
         this.posIndex = posIndex;
         this.nameIndex = nameIndex;
+        this.types = types;
     }
 
     public int[] getPosIndex() {
@@ -31,6 +34,10 @@ public class Lines extends ArrayList<Object[]>{
 
     public Object[] getNameIndex() {
         return nameIndex;
+    }
+
+    public Object[] getTypes() {
+        return types;
     }
 
     public int getPosNameIndex(Object name) {
@@ -56,7 +63,7 @@ public class Lines extends ArrayList<Object[]>{
         for (Integer i : ids) {
             res.add(get(i));
         }
-        return new Lines(null,null, res);
+        return new Lines(null,null, res, null);
     }
 
     public ArrayList<Object[]> getLines(int pos, Object value) {
