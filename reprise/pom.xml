@@ -5,7 +5,7 @@
 	<artifactId>dant</artifactId>
 	<packaging>war</packaging>
 	<version>1.0</version>
-	<name>tarentule</name>
+	<name>Tarentule</name>
 
 	<properties>
 		<resteasy.version>3.6.3.Final</resteasy.version>
@@ -78,19 +78,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-jsp</artifactId>
-			<version>${jetty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-http</artifactId>
 			<version>${jetty.version}</version>
-		</dependency>
-		<!--  Servlet API -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${javax.version}</version>
 		</dependency>
 		<!-- Logger -->
 		<dependency>
@@ -103,9 +92,27 @@
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
+		<!-- Junit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>2.17</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-jetty-servlet</artifactId>
+			<version>2.17</version>
+		</dependency>
 	</dependencies>
 	<build>
-		<finalName>dant</finalName>
+		<finalName>Tarentule</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -1,27 +1,32 @@
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.webapp.WebAppContext;
-
-import java.net.URL;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 public class Main {
-        public static void main( String[] args ) throws Exception {
-            Server server = new Server(8080);
 
-            WebAppContext root = new WebAppContext();
-            root.setContextPath("/");
-            root.setDescriptor("webapp/WEB-INF/web.xml");
-            URL webAppDir = Thread.currentThread().getContextClassLoader().getResource("webapp");
-            if (webAppDir == null) {
-                throw new RuntimeException("No webapp directory was found into the JAR file");
-            }
-            root.setResourceBase(webAppDir.toURI().toString());
-            root.setParentLoaderPriority(true);
-            //App.getSingleton();
-            server.setHandler(root);
-            server.start();
+    public static void main(String[] args) {
 
-            //Monitor monitor = new Monitor(8090, new Server[] {server});
-            //monitor.start();
-            server.join();
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        context.setContextPath("/");
+
+        Server jettyServer = new Server(8080);
+        jettyServer.setHandler(context);
+
+        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/*");
+        jerseyServlet.setInitOrder(0);
+
+        // Tells the Jersey Servlet which REST service/class to load.
+        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "core.app");
+
+        try {
+            jettyServer.start();
+            jettyServer.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            jettyServer.destroy();
         }
+    }
+
 }

@@ -2,7 +2,12 @@ package core.app;
 
 import core.exception.RuntimeExceptionMapper;
 import core.filter.GsonProvider;
-
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import java.util.EventListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -26,4 +31,5 @@ public class App extends Application {
 		sets.add(RuntimeExceptionMapper.class);
 		return sets;
 	}
+
 }
