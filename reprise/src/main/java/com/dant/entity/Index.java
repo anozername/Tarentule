@@ -98,17 +98,19 @@ public class Index {
     }
 
     public List<Integer> getValueWithoutIndex(Map<String, Object[]> queries){
-        Map<Integer, Object> conditions = new HashMap<>();
-        for (Map.Entry<String, Object[]> query : queries.entrySet()) {
-            conditions.put(lines.getPosNameIndex(query.getKey()), query.getValue()[0]);
-        }
         List<Integer> res = new ArrayList<>();
+        boolean b = false;
         for (Object[] line : lines) {
-            for (Map.Entry<Integer, Object> condition : conditions.entrySet()) {
+            for (Map.Entry<String, Object[]> query : queries.entrySet()) {
                 //0 car seule la premiere entree est consideree pour l instant
-                if (line[condition.getKey()].equals(condition.getValue())) {
-                    res.add((Integer) line[lines.getPosID()]);
+                if (line[lines.getPosNameIndex(query.getKey())].equals(query.getValue()[0])) {
+                    b = true;
                 }
+                else b = false;
+            }
+            if (b == true) {
+                res.add((Integer) line[lines.getPosID()]);
+                b = false;
             }
         }
         return res;

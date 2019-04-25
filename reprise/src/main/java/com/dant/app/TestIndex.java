@@ -62,7 +62,7 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
-        //insertion_test();
+        insertion_test();
         index.setLines(lines);
         int acc = 0;
         List<Integer> tmp = new ArrayList<>();
@@ -84,7 +84,7 @@ public class TestIndex {
         }
         indexTMP.clear();
         notIndexTMP.clear();
-        return index.getLines().getLines(tmp).toString();
+       return index.getLines().getLines(tmp).toString();
     }
 
     public List<Integer> getLinesWithoutIndex(List<Integer> tmp, int acc) {
@@ -274,6 +274,7 @@ public class TestIndex {
         index.putValues();
     }
 
+    //et
     public static List<Integer> computeResults(List<Integer> res_querie1, List<Integer> res_querie2)  {
         if (res_querie1 == null || res_querie2 == null) return new ArrayList<>();
         List<Integer> tmp = new ArrayList<>();
