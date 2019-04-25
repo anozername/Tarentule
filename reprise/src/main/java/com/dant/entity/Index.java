@@ -2,6 +2,8 @@ package com.dant.entity;
 
 import java.util.*;
 import java.util.HashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MultivaluedHashMap;
 
 public class Index {
 
@@ -59,7 +61,7 @@ public class Index {
 
     //@TODO renvoyer une List ids pour queries et puis recherche de lines avec ids
 
-    public List<Integer> get(String key) {
+    /*public List<Integer> get(String key) {
         if(hashmap.containsKey(key)) {
             return getValueWithIndex(key);
         }
@@ -71,7 +73,7 @@ public class Index {
             return getValueWithIndex(key, value);
         }
         return getValueWithoutIndex(key, value);
-    }
+    }*/
 
     /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
     public List<Integer> getValueWithIndex(String key) {
@@ -95,12 +97,18 @@ public class Index {
         return res;
     }
 
-    public List<Integer> getValueWithoutIndex(String key, Object value){
-        int pos = lines.getPosNameIndex(key);
+    public List<Integer> getValueWithoutIndex(Map<String, Object[]> queries){
+        Map<Integer, Object> conditions = new HashMap<>();
+        for (Map.Entry<String, Object[]> query : queries.entrySet()) {
+            conditions.put(lines.getPosNameIndex(query.getKey()), query.getValue()[0]);
+        }
         List<Integer> res = new ArrayList<>();
         for (Object[] line : lines) {
-            if (line[pos].equals(value)) {
-                res.add((Integer)line[lines.getPosID()]);
+            for (Map.Entry<Integer, Object> condition : conditions.entrySet()) {
+                //0 car seule la premiere entree est consideree pour l instant
+                if (line[condition.getKey()].equals(condition.getValue())) {
+                    res.add((Integer) line[lines.getPosID()]);
+                }
             }
         }
         return res;

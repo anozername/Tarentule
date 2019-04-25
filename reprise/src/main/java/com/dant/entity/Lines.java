@@ -55,8 +55,7 @@ public class Lines extends ArrayList<Object[]>{
     }
     
     /********************************************************		find		*/
-    
-    /* return lines on all data only - obsolete */
+
     public Lines getLines(List<Integer> ids) {
     	ArrayList<Object[]> res = new ArrayList<Object[]>();
     	Object[] line;
@@ -68,17 +67,8 @@ public class Lines extends ArrayList<Object[]>{
         return new Lines(res);
     }
 
-    /* return lines matching the ids */
-    public Lines getLinesByIDS(List<Integer> ids) {
-        ArrayList<Object[]> res = new ArrayList<Object[]>();
-        for (Integer i : ids) {
-            res.add(get(i));
-        }
-        return new Lines(res);
-    }
-
     //@IDEA peut etre rechercher a partir de sublines a chaque fois car ids donnés dans l'ordre
-    public Object[] rechercheDicho(int val){
+    public Object[] rechercheDicho(Integer val){
 
         /* déclaration des variables locales à la fonction */
         boolean trouve;
@@ -104,7 +94,7 @@ public class Lines extends ArrayList<Object[]>{
         }
 
         /* test conditionnant la valeur que la fonction va renvoyer */
-        if((Integer)get(id)[posID] == val) return(get(id));
+        if(get(id)[posID] == val) return(get(id));
         else return null;
 
     }
