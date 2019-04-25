@@ -25,3 +25,10 @@ hs_err_pid*
 #IDE
 .idea/
 /bin/
+reprise/.idea
+reprise/.settings
+reprise/target
+
+#IO
+input.csv
+
