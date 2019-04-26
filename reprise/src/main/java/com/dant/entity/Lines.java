@@ -59,8 +59,8 @@ public class Lines extends ArrayList<Object[]>{
     public Lines getLines(List<Integer> ids) {
     	ArrayList<Object[]> res = new ArrayList<Object[]>();
     	Object[] line;
-        for (Integer i : ids) {
-            if ((line = rechercheDicho(i)) != null) {
+        for (Integer it : ids) {
+            if ((line = rechercheDicho(it)) != null) {
                 res.add(line);
             }
         }
@@ -69,10 +69,24 @@ public class Lines extends ArrayList<Object[]>{
 
     public Lines getLinesWithSelect(List<Integer> ids, List<String> selection) {
         ArrayList<Object[]> res = new ArrayList<Object[]>();
+        int acc = 0;
         Object[] line;
-        for (Integer i : ids) {
-            if ((line = rechercheDicho(i)) != null) {
-                res.add(line);
+        Object[] selectLine = new Object[selection.size()];
+        List<Integer> select = new ArrayList<>();
+        for (String attribute : selection) {
+            for (int i = 0; i < nameIndex.length; i++) {
+                if (attribute.equals(nameIndex[i].toString())) {
+                    select.add(i);
+                    break;
+                }
+            }
+        }
+        for (Integer it : ids) {
+            if ((line = rechercheDicho(it)) != null) {
+                for (int x=0; x<select.size(); x++) {
+                    selectLine[x] = line[select.get(x)];
+                }
+                res.add(selectLine);
             }
         }
         return new Lines(res);

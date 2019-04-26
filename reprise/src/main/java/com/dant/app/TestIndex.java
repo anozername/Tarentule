@@ -19,6 +19,7 @@ public class TestIndex {
 
     private static Index index;
     private static Lines lines;
+    private static boolean selection = false;
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
     private static Map<String, Object[]> queriesTMP = new HashMap<>();
     private static Map<String, Object[]> indexTMP = new HashMap<>();
@@ -91,7 +92,8 @@ public class TestIndex {
         indexTMP.clear();
         notIndexTMP.clear();
         //les 2 queries reoturnent le bon resultat mais ne se computent pas
-       return index.getHashmap().toString();
+        if (selection == true) return index.getLines().getLinesWithSelect(tmp, queryParams.get("SELECT")).toString();
+        else return index.getLines().getLines(tmp).toString();
     }
 
     public List<Integer> getLinesWithoutIndex(List<Integer> tmp, int acc) {
@@ -148,43 +150,45 @@ public class TestIndex {
         MultivaluedMap<String, List<Object>> mapTMP = new MultivaluedHashMap<>();
         Map.Entry<String, Object[]> entryTMP =  new AbstractMap.SimpleEntry<>(null, null);
         for (Map.Entry<String, List<String>> queries : queryParams.entrySet()) {
-            for (int i = 0; i < attributes.length; i++) {
-                if (queries.getKey().equals(attributes[i].toString())) {
-                    switch (index.getLines().getTypes()[i].toString()) {
-                        case "date":
-                            entryTMP = castToDateMap(queries);
-                            queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                            break;
-                        case "double":
-                            //entryTMP = castToDoubleMap(queries);
-                            numbers = new Object[queries.getValue().size()];
-                            for (int j=0; j<queries.getValue().size(); j++) {
+            if (queries.getKey().equals("SELECT")) selection = true;
+            else {
+                for (int i = 0; i < attributes.length; i++) {
+                    if (queries.getKey().equals(attributes[i].toString())) {
+                        switch (index.getLines().getTypes()[i].toString()) {
+                            case "date":
+                                entryTMP = castToDateMap(queries);
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                                break;
+                            case "double":
+                                //entryTMP = castToDoubleMap(queries);
+                                numbers = new Object[queries.getValue().size()];
+                                for (int j=0; j<queries.getValue().size(); j++) {
                                     Optional<Integer> it = CastHelper.castToInteger(queries.getValue().get(j));
                                     //Optional<Double> db = CastHelper.castToDouble(queries.getValue().get(j));
                                     if (it.isPresent()) numbers[j] = it.get();
                                     else numbers[j] = Double.parseDouble(queries.getValue().get(j));
-                            }
-                            entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), numbers);
-                            queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                            break;
-                        case "string":
-                            entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), queries.getValue().toArray());
-                            queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                            break;
-                        default:
-                            //entryTMP = null;
-                            queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                }
-                    if (index.getHashmap().containsKey(queries.getKey())) {
-                        indexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
+                                }
+                                entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), numbers);
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                                break;
+                            case "string":
+                                entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), queries.getValue().toArray());
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                                break;
+                            default:
+                                //entryTMP = null;
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                        }
+                        if (index.getHashmap().containsKey(queries.getKey())) {
+                            indexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
+                        }
+                        else {
+                            notIndexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
+                        }
+                        break;
                     }
-                    else {
-                        notIndexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
-                    }
-                break;
                 }
             }
-
         }
         queriesTMP.clear();
     }
