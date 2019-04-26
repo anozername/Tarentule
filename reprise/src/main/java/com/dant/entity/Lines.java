@@ -67,6 +67,19 @@ public class Lines extends ArrayList<Object[]>{
         return new Lines(res);
     }
 
+    public Lines getLinesWithSelect(List<Integer> ids, List<String> selection) {
+        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        Object[] line;
+        for (Integer i : ids) {
+            if ((line = rechercheDicho(i)) != null) {
+                res.add(line);
+            }
+        }
+        return new Lines(res);
+    }
+
+
+
     //@IDEA peut etre rechercher a partir de sublines a chaque fois car ids donnés dans l'ordre
     public Object[] rechercheDicho(Integer val){
 

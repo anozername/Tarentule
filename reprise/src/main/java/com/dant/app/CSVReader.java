@@ -26,7 +26,7 @@ public class CSVReader {
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             Optional<Integer> it;
             List<Object> tmp;
-            Integer id = 0;
+            Integer id = 1;
 
             line = br.readLine();
             Object[] trip = line.split(cvsSplitBy);
@@ -131,6 +131,8 @@ public class CSVReader {
         if (db.isPresent()) {
             posDouble.add(i);
             types.add("double");
+            it = CastHelper.castToInteger(data);
+            if (it.isPresent()) return it.get();
             return db.get();
         }
         types.add("string");

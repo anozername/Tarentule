@@ -62,7 +62,7 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
-        //insertion_test();
+        insertion_test();
         index.setLines(lines);
         int acc = 1;
         Results tmp = new Results();
@@ -91,7 +91,7 @@ public class TestIndex {
         indexTMP.clear();
         notIndexTMP.clear();
         //les 2 queries reoturnent le bon resultat mais ne se computent pas
-       return index.getLines().getLines(tmp).toString();
+       return index.getHashmap().toString();
     }
 
     public List<Integer> getLinesWithoutIndex(List<Integer> tmp, int acc) {
