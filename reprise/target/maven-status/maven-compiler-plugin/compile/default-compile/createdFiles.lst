@@ -1,6 +1,7 @@
 com\dant\entity\Column.class
 com\dant\app\TestIndex.class
 com\dant\entity\Lines.class
+com\dant\app\Results.class
 com\dant\entity\Trip.class
 com\dant\app\CastHelper.class
 com\dant\entity\HashMapValues.class

@@ -62,35 +62,42 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
-        insertion_test();
+        //insertion_test();
         index.setLines(lines);
-        int acc = 0;
-        List<Integer> tmp = new ArrayList<>();
+        int acc = 1;
+        Results tmp = new Results();
         Map<String,List<Integer>> queriesWithoutIndex = new HashMap<>();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         parser(queryParams);
         for (Map.Entry<String, Object[]> query : indexTMP.entrySet()) {
-            acc++;
             if (acc != 1) {
-                tmp = computeResults(tmp, index.getValueWithIndex(query.getKey(), query.getValue()[0]));
+                tmp = tmp.computeResults(index.getValueWithIndex(query.getKey(), query.getValue()[0]));
             }
             else {
-                tmp = index.getValueWithIndex(query.getKey(), query.getValue()[0]);
+                tmp = new Results(index.getValueWithIndex(query.getKey(), query.getValue()[0]));
             }
             index.setLines(index.getLines().getLines(tmp));
+            acc++;
         }
         if (!notIndexTMP.isEmpty()) {
-            tmp = getLinesWithoutIndex(tmp, acc);
+            if (acc != 1) {
+                tmp = tmp.computeResults(index.getValueWithoutIndex(notIndexTMP));
+            }
+            else {
+                tmp = new Results(index.getValueWithoutIndex(notIndexTMP));
+            }
+            acc++;
         }
         indexTMP.clear();
         notIndexTMP.clear();
+        //les 2 queries reoturnent le bon resultat mais ne se computent pas
        return index.getLines().getLines(tmp).toString();
     }
 
     public List<Integer> getLinesWithoutIndex(List<Integer> tmp, int acc) {
         acc++;
         if (acc != 1) {
-            tmp = computeResults(tmp, index.getValueWithoutIndex(notIndexTMP));
+            tmp = index.getValueWithoutIndex(notIndexTMP);
         } else {
             tmp = index.getValueWithoutIndex(notIndexTMP);
         }
@@ -276,7 +283,7 @@ public class TestIndex {
 
     //et
     public static List<Integer> computeResults(List<Integer> res_querie1, List<Integer> res_querie2)  {
-        if (res_querie1 == null || res_querie2 == null) return new ArrayList<>();
+        if (res_querie1 == null) return new ArrayList<>();
         List<Integer> tmp = new ArrayList<>();
         for (int iq1 : res_querie1) {
             for (int iq2 : res_querie2) {

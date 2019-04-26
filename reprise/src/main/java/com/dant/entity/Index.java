@@ -37,21 +37,19 @@ public class Index {
     public void putValues() {
         HashMapValues values = new HashMapValues();
         ArrayList<Integer> ids;
-        int id = 0;
         for (int index : lines.getPosIndex()) {
             for (Object[] line : lines) {
                 if (values.hasValue(line[index])) {
                     ids = values.get(line[index]);
-                    ids.add(id);
+                    ids.add((Integer)line[lines.getPosID()]);
                     values.replace(line[index], ids);
                 }
                 else {
                     ids = new ArrayList<Integer>();
-                    ids.add(id);
+                    ids.add((Integer)line[lines.getPosID()]);
                     //nouvelle valeur a chaque fois
                     values.put(line[index], ids);
                 }
-                id++;
             }
             hashmap.put((String)lines.getNameIndex()[index], values);
         }
@@ -99,18 +97,18 @@ public class Index {
 
     public List<Integer> getValueWithoutIndex(Map<String, Object[]> queries){
         List<Integer> res = new ArrayList<>();
-        boolean b = false;
+        int satisfaction = 0;
         for (Object[] line : lines) {
             for (Map.Entry<String, Object[]> query : queries.entrySet()) {
                 //0 car seule la premiere entree est consideree pour l instant
                 if (line[lines.getPosNameIndex(query.getKey())].equals(query.getValue()[0])) {
-                    b = true;
+                    satisfaction++;
                 }
-                else b = false;
+                else satisfaction = 0;
             }
-            if (b == true) {
+            if (satisfaction == queries.size()) {
                 res.add((Integer) line[lines.getPosID()]);
-                b = false;
+                satisfaction = 0;
             }
         }
         return res;
