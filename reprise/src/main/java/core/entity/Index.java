@@ -2,11 +2,13 @@ package core.entity;
 
 import java.util.*;
 import java.util.HashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.MultivaluedHashMap;
 
 public class Index {
 
     private Lines lines;
-    private HashMap<String, HashMapValues> hashmap = new HashMap<String, HashMapValues>();
+    private static final HashMap<String, HashMapValues> hashmap = new HashMap<String, HashMapValues>();
 
     public Index(Lines lines) {
         this.lines = lines;
@@ -21,7 +23,7 @@ public class Index {
     }
 
     public void setLines(Lines lines) {
-        this.lines = new Lines(null, null, lines, null);
+        this.lines = lines;
     }
     
     /********************************************************		helpers		*/
@@ -35,21 +37,19 @@ public class Index {
     public void putValues() {
         HashMapValues values = new HashMapValues();
         ArrayList<Integer> ids;
-        int id = 0;
         for (int index : lines.getPosIndex()) {
             for (Object[] line : lines) {
                 if (values.hasValue(line[index])) {
                     ids = values.get(line[index]);
-                    ids.add(id);
+                    ids.add((Integer)line[lines.getPosID()]);
                     values.replace(line[index], ids);
                 }
                 else {
                     ids = new ArrayList<Integer>();
-                    ids.add(id);
+                    ids.add((Integer)line[lines.getPosID()]);
                     //nouvelle valeur a chaque fois
                     values.put(line[index], ids);
                 }
-                id++;
             }
             hashmap.put((String)lines.getNameIndex()[index], values);
         }
@@ -59,7 +59,7 @@ public class Index {
 
     //@TODO renvoyer une List ids pour queries et puis recherche de lines avec ids
 
-    public List<Integer> get(String key) {
+    /*public List<Integer> get(String key) {
         if(hashmap.containsKey(key)) {
             return getValueWithIndex(key);
         }
@@ -71,7 +71,7 @@ public class Index {
             return getValueWithIndex(key, value);
         }
         return getValueWithoutIndex(key, value);
-    }
+    }*/
 
     /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
     public List<Integer> getValueWithIndex(String key) {
@@ -95,12 +95,20 @@ public class Index {
         return res;
     }
 
-    public List<Integer> getValueWithoutIndex(String key, Object value){
-        int pos = lines.getPosNameIndex(key);
+    public List<Integer> getValueWithoutIndex(Map<String, Object[]> queries){
         List<Integer> res = new ArrayList<>();
+        int satisfaction = 0;
         for (Object[] line : lines) {
-            if (line[pos].equals(value)) {
-                res.add((Integer)line[lines.getPosID()]);
+            for (Map.Entry<String, Object[]> query : queries.entrySet()) {
+                //0 car seule la premiere entree est consideree pour l instant
+                if (line[lines.getPosNameIndex(query.getKey())].equals(query.getValue()[0])) {
+                    satisfaction++;
+                }
+                else satisfaction = 0;
+            }
+            if (satisfaction == queries.size()) {
+                res.add((Integer) line[lines.getPosID()]);
+                satisfaction = 0;
             }
         }
         return res;

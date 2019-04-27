@@ -3,17 +3,10 @@ package core.app;
 import core.entity.*;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.io.File;
-import java.util.Map;
-import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -26,7 +19,11 @@ public class TestIndex {
 
     private static Index index;
     private static Lines lines;
+    private static boolean selection = false;
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    private static Map<String, Object[]> queriesTMP = new HashMap<>();
+    private static Map<String, Object[]> indexTMP = new HashMap<>();
+    private static Map<String, Object[]> notIndexTMP = new HashMap<>();
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -57,15 +54,7 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
     public String insert() {
-        List<Object[]> content = CSVReader.readLines();
-
-        //definir ici les index
-        int[] defineIndex = {3};
-        Object[] attributes = content.remove(0);
-        Object[] types = content.get(content.size()-1);
-        lines = new Lines(defineIndex, attributes, content, types);
-        index = new Index(lines);
-        index.putValues();
+        insertion_test();
         return "insertion ok";
        //return "pas insert car developpement";
     }
@@ -74,20 +63,48 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
-        //insertion_test();
-        List<Integer> tmp = new ArrayList<>();
+        insertion_test();
+        index.setLines(lines);
+        int acc = 1;
+        Results tmp = new Results();
+        Map<String,List<Integer>> queriesWithoutIndex = new HashMap<>();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        for (Map.Entry<String,List<String>> query : queryParams.entrySet()) {
-            if (!tmp.isEmpty()) {
-                tmp = computeResults(tmp, parser(query.getKey(), query.getValue().get(0)));
+        parser(queryParams);
+        for (Map.Entry<String, Object[]> query : indexTMP.entrySet()) {
+            if (acc != 1) {
+                tmp = tmp.computeResults(index.getValueWithIndex(query.getKey(), query.getValue()[0]));
             }
             else {
-                tmp = parser(query.getKey(), query.getValue().get(0));
+                tmp = new Results(index.getValueWithIndex(query.getKey(), query.getValue()[0]));
             }
-            //index.setLines(lines.getLines(tmp));
+            index.setLines(index.getLines().getLines(tmp));
+            acc++;
         }
-        //index.setLines(lines);
-        return index.getLines().getLines(tmp).toString();
+        if (!notIndexTMP.isEmpty()) {
+            if (acc != 1) {
+                tmp = tmp.computeResults(index.getValueWithoutIndex(notIndexTMP));
+            }
+            else {
+                tmp = new Results(index.getValueWithoutIndex(notIndexTMP));
+            }
+            acc++;
+        }
+        indexTMP.clear();
+        notIndexTMP.clear();
+        //les 2 queries reoturnent le bon resultat mais ne se computent pas
+        if (selection == true) return index.getLines().getLinesWithSelect(tmp, queryParams.get("SELECT")).toString();
+        else return index.getLines().getLines(tmp).toString();
+    }
+
+    public List<Integer> getLinesWithoutIndex(List<Integer> tmp, int acc) {
+        acc++;
+        if (acc != 1) {
+            tmp = index.getValueWithoutIndex(notIndexTMP);
+        } else {
+            tmp = index.getValueWithoutIndex(notIndexTMP);
+        }
+        //index.setLines(lines.getLines(tmp));
+        return tmp;
     }
 
 
@@ -97,31 +114,110 @@ public class TestIndex {
         throw new RuntimeException("oups...");
     }
 
-    public static List<Integer> parser(String cmd, String value) {
-        Object[] attributes = index.getLines().getNameIndex();
-        for (int i=0; i<attributes.length; i++) {
-            if (cmd.equals(attributes[i].toString())) {
-                switch (index.getLines().getTypes()[i].toString()) {
-                    case "date":
-                        try {
-                            return (index.get(cmd, sdf.parse(value)));
-                        }
-                        catch (Exception e) {
-                            return null;
-                        }
-                    case "double":
-                        Optional<Integer> it = CastHelper.castToInteger(value);
-                        if (it.isPresent()) return (index.get(cmd, it.get()));
-                        return (index.get(cmd, Double.parseDouble(value)));
+    public static Map.Entry<String, Object[]> castToDateMap(Map.Entry<String, List<String>> entries) {
+        List<Date> tmp = new ArrayList<>();
+        for (String value : entries.getValue()) {
+            try {
+                tmp.add(sdf.parse(value));
+            }
+            catch (Exception e) {
+                return null;
+            }
+        }
+        return new AbstractMap.SimpleEntry<>(entries.getKey(), tmp.toArray());
+    }
 
-                    case "string":
-                        return (index.get(cmd, value));
-                    default:
-                        return new ArrayList<>();
+    /*public static Map.Entry<String, Object[]> castToIntegerMap(Map.Entry<String, List<String>> entries) {
+        List<Integer> tmp = new ArrayList<>();
+        for (String value : entries.getValue()) {
+            tmp.add(Integer.parseInt(value));
+        }
+        return new AbstractMap.SimpleEntry<>(entries.getKey(), tmp.toArray());
+    }*/
+
+    public static Map.Entry<String, Object[]> castToDoubleMap(Map.Entry<String, List<String>> entries) {
+        List<Double> tmp = new ArrayList<>();
+        for (String value : entries.getValue()) {
+            tmp.add(Double.parseDouble(value));
+        }
+        return new AbstractMap.SimpleEntry<>(entries.getKey(), tmp.toArray());
+    }
+
+
+    public static void parser(MultivaluedMap<String,String> queryParams) {
+        Object[] numbers;
+        Object[] attributes = index.getLines().getNameIndex();
+        MultivaluedMap<String, List<Object>> mapTMP = new MultivaluedHashMap<>();
+        Map.Entry<String, Object[]> entryTMP =  new AbstractMap.SimpleEntry<>(null, null);
+        for (Map.Entry<String, List<String>> queries : queryParams.entrySet()) {
+            if (queries.getKey().equals("SELECT")) selection = true;
+            else {
+                for (int i = 0; i < attributes.length; i++) {
+                    if (queries.getKey().equals(attributes[i].toString())) {
+                        switch (index.getLines().getTypes()[i].toString()) {
+                            case "date":
+                                entryTMP = castToDateMap(queries);
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                                break;
+                            case "double":
+                                //entryTMP = castToDoubleMap(queries);
+                                numbers = new Object[queries.getValue().size()];
+                                for (int j=0; j<queries.getValue().size(); j++) {
+                                    Optional<Integer> it = CastHelper.castToInteger(queries.getValue().get(j));
+                                    //Optional<Double> db = CastHelper.castToDouble(queries.getValue().get(j));
+                                    if (it.isPresent()) numbers[j] = it.get();
+                                    else numbers[j] = Double.parseDouble(queries.getValue().get(j));
+                                }
+                                entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), numbers);
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                                break;
+                            case "string":
+                                entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), queries.getValue().toArray());
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                                break;
+                            default:
+                                //entryTMP = null;
+                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
+                        }
+                        if (index.getHashmap().containsKey(queries.getKey())) {
+                            indexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
+                        }
+                        else {
+                            notIndexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
+                        }
+                        break;
+                    }
                 }
             }
         }
-        return null;
+        queriesTMP.clear();
+    }
+
+
+    /*public static List<Integer> parserHashMap(String cmd, String value) {
+        Object[] attributes = index.getLines().getNameIndex();
+            for (int i = 0; i < attributes.length; i++) {
+                if (cmd.equals(attributes[i].toString())) {
+                    switch (index.getLines().getTypes()[i].toString()) {
+                        case "date":
+                            try {
+                                return (index.get(cmd, sdf.parse(value)));
+                            } catch (Exception e) {
+                                return null;
+                            }
+                        case "double":
+                            Optional<Integer> it = CastHelper.castToInteger(value);
+                            if (it.isPresent()) return (index.get(cmd, it.get()));
+                            return (index.get(cmd, Double.parseDouble(value)));
+
+                        case "string":
+                            return (index.get(cmd, value));
+                        default:
+                            return new ArrayList<>();
+                    }
+                }
+        }
+        return null;*/
 
 
        /* pourrait servir mais pas generique
@@ -174,22 +270,24 @@ public class TestIndex {
         }
         return null;
         *
-        */
-    }
+
+    }*/
 
     /********************************************************		helpers		*/
 
     public void insertion_test() {
         List<Object[]> content = CSVReader.readLines();
-        int[] defineIndex = {3};
+        int[] defineIndex = {4};
         Object[] attributes = content.remove(0);
         Object[] types = content.remove(content.size()-1);
-        Lines lines = new Lines(defineIndex, attributes, content, types);
+        lines = new Lines(defineIndex, attributes, content, types);
         index = new Index(lines);
         index.putValues();
     }
 
+    //et
     public static List<Integer> computeResults(List<Integer> res_querie1, List<Integer> res_querie2)  {
+        if (res_querie1 == null) return new ArrayList<>();
         List<Integer> tmp = new ArrayList<>();
         for (int iq1 : res_querie1) {
             for (int iq2 : res_querie2) {
