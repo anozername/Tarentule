@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>Index</servlet-name>
-        <servlet-class>app.core.search.TestIndex</servlet-class>
+        <servlet-class>app.test.TestIndex</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Index</servlet-name>

@@ -1,4 +1,4 @@
-package app.core.search;
+package app.test;
 
 import app.core.entity.*;
 
@@ -8,11 +8,14 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.File;
 
+import app.core.search.CSVReader;
+import app.core.search.CastHelper;
+import app.core.search.Results;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
-@Path("/index/test")
+@Path("/test/index")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TestIndex {

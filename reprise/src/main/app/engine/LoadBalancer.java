@@ -1,48 +1,56 @@
 package app.engine;
-
-import app.core.entity.Account;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
-/**
- * Created by pitton on 2017-02-31.
- */
-@Path("/node")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class LoadBalancer {
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public String helloWorld() {
-        Node t = new Node("A");
-        Node t2 = new Node("  B");
-        t.start();
-        t2.start();
-        return "Node Engine";
+public class LoadBalancer extends RecursiveTask<Long> {
+    public LoadBalancer(){
+        System.out.println("Balancing...");
     }
 
-    @GET
-    @Path("/add")
-    public List<String> getListInParams(@QueryParam("ids") List<String> ids) {
-        System.out.println(ids);
-        return ids;
+    private int benchmarking(){
+        return Runtime.getRuntime().availableProcessors();
     }
 
-    @POST
-    @Path("/entity")
-    public Account getAccount(Account account) {
-        System.out.println("Received account " + account);
-        account.setUpdated(System.currentTimeMillis());
-        return account;
+    public ForkJoinPool pool(){
+        return new ForkJoinPool(benchmarking());
     }
 
-    @GET
-    @Path("/exception")
-    public Response exception() {
-        throw new RuntimeException("Mon erreur");
+    private long distribute() throws Exception{
+        long join = 0;
+        //Nodes for a specific type of query
+        List<Node> list = new ArrayList<>();
+        //On parcourt la query
+        //TODO adapt to the query parsed
+        for(int i = 0; i<5; i++){
+            //S'il s'agit d'un dossier, on crée une sous-tâche
+            if(i%2==0){
+                //Nous créons donc un nouvel objet Node
+                //Qui se chargera de parcourir le fichier
+                Node node = new Node(true);
+                //Nous l'ajoutons à la liste des tâches en cours pour récupérer le résultat plus tard
+                list.add(node);
+                //C'est cette instruction qui lance l'action en tâche de fond
+                node.fork();
+            }
+        }
+
+        //Et, enfin, nous récupérons le résultat de toutes les tâches de fond
+        for(Node f : list)
+            join += f.join();
+
+        //Nous renvoyons le résultat final
+        return join;
     }
 
+    protected Long compute() {
+        long compute = 0;
+        try {
+            compute = this.distribute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return compute;
+    }
 }

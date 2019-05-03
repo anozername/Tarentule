@@ -1,7 +1,6 @@
-package app.core.search;
+package app.test;
 
 import app.core.entity.Account;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -10,11 +9,10 @@ import java.util.List;
 /**
  * Created by pitton on 2017-02-20.
  */
-@Path("/api/test")
+@Path("/test/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TestEndpoint {
-
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public String helloWorld() {
