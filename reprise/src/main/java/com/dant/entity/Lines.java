@@ -3,7 +3,7 @@ package com.dant.entity;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class Lines extends ArrayList<Object[]>{
+public class Lines extends ArrayList<Object[]> {
     private static final int posID = 0;
     private static int[] posIndex;
     private static Object[] nameIndex;
@@ -20,6 +20,18 @@ public class Lines extends ArrayList<Object[]>{
     public Lines(List<Object[]> list) {
         super();
         this.addAll(list);
+    }
+
+    public Lines() {
+        super();
+    }
+
+    public static Lines createLines(List<List<Object[]>> list) {
+        Lines res = new Lines();
+        for (List<Object[]> l : list) {
+            res.addAll(l);
+        }
+        return res;
     }
 
     public int[] getPosIndex() {
@@ -39,26 +51,35 @@ public class Lines extends ArrayList<Object[]>{
     }
 
     public int getPosNameIndex(Object name) {
-        for (int i=0; i<nameIndex.length; i++) {
+        for (int i = 0; i < nameIndex.length; i++) {
             if (name.equals(nameIndex[i])) {
                 return i;
             }
         }
         return -1;
     }
-    
+
+    public int getIndiceForAttribute(String attribute) {
+        for (int i = 0; i < nameIndex.length; i++) {
+            if (attribute.equals(nameIndex[i].toString())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     /********************************************************		insert		*/
-    
+
     public void setLines(List<Object[]> lines) {
         this.clear();
         this.addAll(lines);
     }
-    
+
     /********************************************************		find		*/
 
     public Lines getLines(List<Integer> ids) {
-    	ArrayList<Object[]> res = new ArrayList<Object[]>();
-    	Object[] line;
+        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        Object[] line;
         for (Integer it : ids) {
             if ((line = rechercheDicho(it)) != null) {
                 res.add(line);
@@ -67,10 +88,48 @@ public class Lines extends ArrayList<Object[]>{
         return new Lines(res);
     }
 
-    public Lines getLinesWithSelect(List<Integer> ids, List<String> selection) {
-        ArrayList<Object[]> res = new ArrayList<Object[]>();
-        int acc = 0;
+    public List<Object[]> getLinesFormatted(List<Integer> ids, List<String> groupBy) {
+        List<List<Object[]>> groupedRes = new ArrayList<>();
+        ArrayList<Object[]> res;
+        List<Integer> indicesGroup = new ArrayList<>();
+        boolean added = false;
+        int satisfaction = 0;
         Object[] line;
+        //if (groupBy.size() == 1 && groupBy.get(0).equals(()))
+        for (String attribute : groupBy) {
+            indicesGroup.add(getIndiceForAttribute(attribute));
+        }
+        for (Integer it : ids) {
+            if ((line = rechercheDicho(it)) != null) {
+                for (List<Object[]> li : groupedRes) {
+                    for (Integer i : indicesGroup) {
+                        if (line[i].equals(li.get(0)[i])) {
+                            satisfaction++;
+                        } else satisfaction = 0;
+                    }
+                    if (satisfaction == indicesGroup.size()) {
+                        li.add(line);
+                        added = true;
+                    }
+                    satisfaction = 0;
+                }
+                if (!added) {
+                    res = new ArrayList<>();
+                    res.add(line);
+                    groupedRes.add(res);
+                }
+                added = false;
+            }
+        }
+        res = new ArrayList<>();
+        for (List<Object[]> l : groupedRes) {
+            res.addAll(l);
+        }
+        return res;
+    }
+
+    public Lines getLinesWithSelect(List<String> selection) {
+        ArrayList<Object[]> res = new ArrayList<Object[]>();
         Object[] selectLine = new Object[selection.size()];
         List<Integer> select = new ArrayList<>();
         for (String attribute : selection) {
@@ -81,21 +140,19 @@ public class Lines extends ArrayList<Object[]>{
                 }
             }
         }
-        for (Integer it : ids) {
-            if ((line = rechercheDicho(it)) != null) {
-                for (int x=0; x<select.size(); x++) {
+        for (Object[] line : this) {
+                for (int x = 0; x < select.size(); x++) {
                     selectLine[x] = line[select.get(x)];
                 }
                 res.add(selectLine);
+                selectLine = new Object[selection.size()];
             }
-        }
         return new Lines(res);
     }
 
 
-
     //@IDEA peut etre rechercher a partir de sublines a chaque fois car ids donnés dans l'ordre
-    public Object[] rechercheDicho(Integer val){
+    public Object[] rechercheDicho(Integer val) {
 
         /* déclaration des variables locales à la fonction */
         boolean trouve;
@@ -110,30 +167,30 @@ public class Lines extends ArrayList<Object[]>{
         ifin = size();
 
         /* boucle de recherche */
-        while(!trouve && ((ifin - id) > 1)){
+        while (!trouve && ((ifin - id) > 1)) {
 
-            im = (id + ifin)/2;
-            tmp = (Integer)get(im)[posID];
+            im = (id + ifin) / 2;
+            tmp = (Integer) get(im)[posID];
             trouve = (tmp == val);
 
-            if(tmp > val) ifin = im;
+            if (tmp > val) ifin = im;
             else id = im;
         }
 
         /* test conditionnant la valeur que la fonction va renvoyer */
-        if(get(id)[posID] == val) return(get(id));
+        if (get(id)[posID] == val) return (get(id));
         else return null;
 
     }
 
     public ArrayList<Object[]> getLines(int pos, Object value) {
-    	ArrayList<Object[]> res = new ArrayList<Object[]>();
-    	for (Object[] line : this) {
-    		if (line[pos].equals(value)) {
-    			res.add(line);
-    		}
-    	}
-    	return res;
+        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        for (Object[] line : this) {
+            if (line[pos].equals(value)) {
+                res.add(line);
+            }
+        }
+        return res;
     }
 
     /********************************************************		print		*/
@@ -149,5 +206,18 @@ public class Lines extends ArrayList<Object[]>{
         }
         return sb.toString();
     }
-    
+
+    public Lines computeResults(Lines l) {
+        //if (l == null) return new ArrayList<>();
+        Lines list = new Lines();
+        for (Object[] iq1 : this) {
+            for (Object[] iq2 : l) {
+                if (iq1[posID].equals(iq2[posID])) {
+                    list.add(iq2);
+                    break;
+                }
+            }
+        }
+        return list;
+    }
 }

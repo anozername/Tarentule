@@ -13,6 +13,10 @@ public class Results extends ArrayList<Integer> {
         addAll(l);
     }
 
+    public void addAllList(List<List<Integer>> list) {
+        for (List<Integer> l : list) addAll(l);
+    }
+
     //et
     public Results computeResults(List<Integer> l)  {
         //if (l == null) return new ArrayList<>();

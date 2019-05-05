@@ -1,9 +1,10 @@
 package com.dant.entity;
 
+import com.dant.app.Results;
+
 import java.util.*;
 import java.util.HashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.MultivaluedHashMap;
+import com.dant.app.Results;
 
 public class Index {
 
@@ -64,16 +65,16 @@ public class Index {
             return getValueWithIndex(key);
         }
         return getValueWithoutIndex(key);
-    }
-
-    public List<Integer> get(String key, Object value) {
-        if(hashmap.containsKey(key)) {
-            return getValueWithIndex(key, value);
-        }
-        return getValueWithoutIndex(key, value);
     }*/
 
-    /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ? */
+    public Lines getWithoutIndexGroupBy(Map<String, Object[]> queries, List<String> groupBy) {
+        if(groupBy.isEmpty()) {
+            return new Lines(getValueWithoutIndex(queries));
+        }
+        return new Lines(getValueWithoutIndex(queries, groupBy));
+    }
+
+    /* return (all...) the data by ids of lines in hashmap -> GROUPBY attribute ? return map<attribute, object[]> puis print ?
     public List<Integer> getValueWithIndex(String key) {
         HashMapValues hashmapvalues = findInHashMap(key);
         List<Integer> res = new ArrayList<>();
@@ -81,10 +82,6 @@ public class Index {
             res.addAll(ids);
         }
         return res;
-    }
-
-    public List<Integer> getValueWithIndex(String key, Object value) {
-        return findInHashMap(key).findInHashMapValues(value);
     }
 
     public List<Integer> getValueWithoutIndex(String key){
@@ -95,8 +92,18 @@ public class Index {
         return res;
     }
 
-    public List<Integer> getValueWithoutIndex(Map<String, Object[]> queries){
-        List<Integer> res = new ArrayList<>();
+     */
+
+    public List<Integer> getValueWithIndex(String key, Object value) {
+        return findInHashMap(key).findInHashMapValues(value);
+       /* List<Integer> ids = findInHashMap(key).findInHashMapValues(value);
+        List<Object[]> res = new ArrayList<>();
+        for (Integer id : ids) res.add(lines.rechercheDicho(id));
+        return res;*/
+    }
+
+    public List<Object[]> getValueWithoutIndex(Map<String, Object[]> queries){
+        List<Object[]> res = new ArrayList<>();
         int satisfaction = 0;
         for (Object[] line : lines) {
             for (Map.Entry<String, Object[]> query : queries.entrySet()) {
@@ -107,9 +114,55 @@ public class Index {
                 else satisfaction = 0;
             }
             if (satisfaction == queries.size()) {
-                res.add((Integer) line[lines.getPosID()]);
+                res.add(line);
                 satisfaction = 0;
             }
+        }
+        return res;
+    }
+
+    public List<Object[]> getValueWithoutIndex(Map<String, Object[]> queries, List<String> groupBy){
+        List<List<Object[]>> groupedRes = new ArrayList<>();
+        List<Object[]> res;
+        List<Integer> indicesGroup = new ArrayList<>();
+        int satisfaction = 0;
+        int friend = 0;
+        boolean added = false;
+        for (String attribute : groupBy) {
+            indicesGroup.add(lines.getIndiceForAttribute(attribute));
+        }
+        for (Object[] line : lines) {
+            for (Map.Entry<String, Object[]> query : queries.entrySet()) {
+                //0 car seule la premiere entree est consideree pour l instant
+                if (line[lines.getPosNameIndex(query.getKey())].equals(query.getValue()[0])) {
+                    satisfaction++;
+                }
+                else satisfaction = 0;
+            }
+            if (satisfaction == queries.size()) {
+                for (List<Object[]> group : groupedRes) {
+                    for (Integer i : indicesGroup) {
+                        if (line[i].equals(group.get(0)[i])) friend++;
+                        else friend = 0;
+                    }
+                    if (friend == indicesGroup.size()) {
+                        group.add(line);
+                        friend = 0;
+                        added = true;
+                    }
+                }
+                if (!added) {
+                    res = new ArrayList<>();
+                    res.add(line);
+                    groupedRes.add(res);
+                }
+                added = false;
+            }
+            satisfaction = 0;
+        }
+        res = new ArrayList<>();
+        for (List<Object[]> l : groupedRes) {
+            res.addAll(l);
         }
         return res;
     }
