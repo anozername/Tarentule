@@ -1,7 +1,6 @@
-package app.test;
+package main.app.test;
 
-import app.engine.LoadBalancer;
-
+import main.app.engine.LoadBalancer;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;

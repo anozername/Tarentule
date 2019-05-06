@@ -1,4 +1,4 @@
-package app.engine.exception;
+package main.app.engine.exception;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

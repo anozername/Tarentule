@@ -99,6 +99,11 @@
                 <version>${slf4j.version}</version>
             </dependency>
         -->
+        <dependency>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>1.4.9</version>
+        </dependency>
         <!-- Junit -->
         <dependency>
             <groupId>junit</groupId>
@@ -126,6 +131,7 @@
     </dependencies>
     <build>
         <finalName>Tarentule</finalName>
+        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -150,7 +156,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>Main</mainClass>
+                            <mainClass>main.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

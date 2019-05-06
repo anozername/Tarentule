@@ -1,13 +1,18 @@
+package main;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
-
 import java.util.Scanner;
 import org.apache.commons.cli.*;
+import org.json.JSONObject;
 
 public class Main {
-
     private static void jetty(int port) {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         context.setContextPath("/");
@@ -19,7 +24,7 @@ public class Main {
         jerseyServlet.setInitOrder(0);
 
         // Tells the Jersey Servlet which REST service/class to load.
-        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "app");
+        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "main.app");
 
         try {
             jettyServer.start();
@@ -88,6 +93,33 @@ public class Main {
         return port;
     }
 
+    private static int addExternalNode(String command){
+        String address_string = "";
+        try {
+            address_string = command.split(" ")[1];
+        }catch (IndexOutOfBoundsException e){
+            System.out.println("Missing argument : 'addExternalNode <address>'");
+            return 1;
+        }
+
+        String result = "";
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.get("http://"+address_string+"/test/api").asJson();
+            result = jsonResponse.getBody().getObject().toString();
+            JSONObject jsonObj = new JSONObject(result);
+            System.out.println(jsonObj);
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    private static void stop(){
+        System.out.println("Bye.");
+        System.exit(0);
+    }
+
     public static void main(String[] args) {
         // <-- Jetty embedded --> // <-- Option setup -->
         jetty(option(args));
@@ -98,9 +130,17 @@ public class Main {
             System.out.println("Enter command :");
 
             String command = myObj.nextLine();  // Read user input
-            System.out.println("command is: " + command);  // Output user input
-            if (command.equals("stop")){
-                System.exit(0);
+            System.out.println("The command is: " + command);  // Output user input
+            switch (command.split(" ")[0]) {
+                case "stop":
+                    stop();
+                    break;
+                case "addExternalNode":
+                    addExternalNode(command);
+                    break;
+                default:
+                    System.out.println("Invalid command");
+                    break;
             }
         }
 

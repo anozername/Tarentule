@@ -1,6 +1,6 @@
-package app.test;
+package main.app.test;
 
-import app.core.entity.Account;
+import main.app.core.entity.Account;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;

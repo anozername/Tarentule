@@ -1,6 +1,6 @@
-package app.test;
+package main.app.test;
 
-import app.core.entity.*;
+import main.app.core.entity.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -8,9 +8,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.File;
 
-import app.core.search.CSVReader;
-import app.core.search.CastHelper;
-import app.core.search.Results;
+import main.app.core.search.CSVReader;
+import main.app.core.search.CastHelper;
+import main.app.core.search.Results;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;

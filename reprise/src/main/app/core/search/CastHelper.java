@@ -1,4 +1,4 @@
-package app.core.search;
+package main.app.core.search;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package app.core.entity;
+package main.app.core.entity;
 
 /**
  * Created by pitton on 2017-02-21.

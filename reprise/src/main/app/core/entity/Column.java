@@ -1,4 +1,4 @@
-package app.core.entity;
+package main.app.core.entity;
 
 public class Column {
     private String name;

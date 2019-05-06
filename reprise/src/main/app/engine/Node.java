@@ -1,4 +1,4 @@
-package app.engine;
+package main.app.engine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class Node extends RecursiveTask<Long> {
 
     private long work(){
         long work = 0;
-        for(int i = 0; i<11000111; i++){
+        for(int i = 0; i<1000111; i++){
             work += (long)(Math.random() * ((100 - 1) + 1)) + 1;
         }
 

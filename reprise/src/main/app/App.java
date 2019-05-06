@@ -1,9 +1,9 @@
-package app;
+package main.app;
 
-import app.core.filter.GsonProvider;
-import app.test.TestEndpoint;
-import app.test.TestEngine;
-import app.test.TestIndex;
+import main.app.test.TestEndpoint;
+import main.app.core.filter.GsonProvider;
+import main.app.test.TestEngine;
+import main.app.test.TestIndex;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

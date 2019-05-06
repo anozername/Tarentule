@@ -1,4 +1,4 @@
-package app.core.filter;
+package main.app.core.filter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

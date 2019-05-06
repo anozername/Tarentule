@@ -1,4 +1,4 @@
-package app.core.search;
+package main.app.core.search;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
