@@ -19,7 +19,7 @@ public class TestIndex {
 
     private static Index index;
     private static Lines lines;
-    private static boolean selection = false;
+    private static List<String> selection = new ArrayList<>();
     private static List<String> groupBy = new ArrayList<>();
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
     private static Map<String, Object[]> queriesTMP = new HashMap<>();
@@ -64,11 +64,11 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo) {
-        //insertion_test();
+        insertion_test();
         indexTMP.clear();
         notIndexTMP.clear();
         groupBy.clear();
-        selection = false;
+        selection.clear();
         int acc = 1;
         index.setLines(lines);
         Results tmp = new Results();
@@ -111,7 +111,7 @@ public class TestIndex {
         //return linesTMP.toString();
         /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
         les 2 queries reoturnent le bon resultat mais ne se computent pas*/
-        if (selection == true) return linesTMP.getLinesWithSelect(queryParams.get("SELECT")).toString();
+        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection).toString();
         else return linesTMP.toString();
     }
 
@@ -158,7 +158,7 @@ public class TestIndex {
         MultivaluedMap<String, List<Object>> mapTMP = new MultivaluedHashMap<>();
         Map.Entry<String, Object[]> entryTMP =  new AbstractMap.SimpleEntry<>(null, null);
         for (Map.Entry<String, List<String>> queries : queryParams.entrySet()) {
-            if (queries.getKey().equals("SELECT")) selection = true;
+            if (queries.getKey().equals("SELECT")) selection = queries.getValue();
             if (queries.getKey().equals("GROUPBY")) groupBy.addAll(queries.getValue());
             else {
                 for (int i = 0; i < attributes.length; i++) {
