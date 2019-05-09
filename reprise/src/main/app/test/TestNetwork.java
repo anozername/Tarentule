@@ -4,6 +4,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import main.Main;
+import main.app.engine.LoadBalancer;
 import org.json.JSONObject;
 
 import javax.ws.rs.Consumes;
@@ -25,29 +27,41 @@ public class TestNetwork {
         String result = "";
 
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.get("http://localhost:8081/test/network").asJson();
+            HttpResponse<JsonNode> jsonResponse = Unirest.get("http://localhost:8081/test/engine").asJson();
             result = jsonResponse.getBody().getObject().toString();
             JSONObject jsonObj = new JSONObject(result);
-            Long name = jsonObj.getLong("response");
-            System.out.println(name);
+            Long response = jsonObj.getLong("response");
+            System.out.println(response);
         } catch (UnirestException e) {
             e.printStackTrace();
         }
 
         return Response.status(Response.Status.OK).entity(result).build();
     }
+    @GET
+    @Path("/list")
+    @Produces(MediaType.TEXT_HTML)
+    public String list() {
+        return Main.externalNodes.toString();
+    }
+
+    @GET
+    @Path("/json")
+    public Response json() {
+        return Response.status(Response.Status.OK).entity(new ResponseEngine(0L,100L)).build();
+    }
 
     public class ResponseEngine {
-        Long temps;
+        Long time;
         Long response;
 
-        ResponseEngine(Long temps, Long response) {
-            setTemps(temps);
+        ResponseEngine(Long time, Long response) {
+            setTemps(time);
             setResponse(response);
         }
 
-        void setTemps(Long temps) {
-            this.temps = temps;
+        void setTemps(Long time) {
+            this.time = time;
         }
 
         void setResponse(Long response) {

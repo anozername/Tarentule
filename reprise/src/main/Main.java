@@ -8,11 +8,16 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import org.apache.commons.cli.*;
 import org.json.JSONObject;
 
 public class Main {
+    public static List<String> externalNodes = new ArrayList<>();
+
     private static void jetty(int port) {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         context.setContextPath("/");
@@ -73,7 +78,7 @@ public class Main {
             }
             if(cmd.hasOption("debug")) {
                 //TODO
-                System.out.println("debug not implemented");
+                System.out.println("TODO debug mode");
             }
         }
         catch (ParseException e) {
@@ -93,26 +98,24 @@ public class Main {
         return port;
     }
 
-    private static int addExternalNode(String command){
-        String address_string = "";
-        try {
-            address_string = command.split(" ")[1];
-        }catch (IndexOutOfBoundsException e){
+    private static void addExternalNode(String command){
+        String[] command_splitted = command.split(" ");
+        if (command_splitted.length == 1){
             System.out.println("Missing argument : 'addExternalNode <address>'");
-            return 1;
         }
-
-        String result = "";
-        try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.get("http://"+address_string+"/test/api").asJson();
-            result = jsonResponse.getBody().getObject().toString();
-            JSONObject jsonObj = new JSONObject(result);
-            System.out.println(jsonObj);
-        } catch (UnirestException e) {
-            e.printStackTrace();
+        for (int i = 1; i < command_splitted.length;i++) {
+            String address_string = command_splitted[i];
+            try {
+                HttpResponse<JsonNode> jsonResponse = Unirest.get("http://" + address_string + "/test/api/json").asJson();
+                String result = jsonResponse.getBody().getObject().toString();
+                JSONObject jsonObj = new JSONObject(result);
+                System.out.println(jsonObj);
+                externalNodes.add(address_string);
+            } catch (UnirestException e) {
+                //e.printStackTrace();
+                System.out.println(address_string + " is not a valid node address.");
+            }
         }
-
-        return 0;
     }
 
     private static void stop(){

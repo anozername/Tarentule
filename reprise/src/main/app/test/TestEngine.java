@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 public class TestEngine {
     @GET
     public Response getJsonResponse() {
-        //Création de notre tâche principale qui se charge de découper son travail en sous-tâches
         LoadBalancer loadBalancer = new LoadBalancer();
 
         Long start = System.currentTimeMillis();
