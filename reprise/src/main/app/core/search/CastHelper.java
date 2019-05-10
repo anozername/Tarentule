@@ -31,4 +31,19 @@ public class CastHelper {
             return Optional.empty();
         }
     }
+
+    public static Object casting(String data) {
+        Optional<Date> dt = CastHelper.castToDate(data);
+        Optional<Double> db = CastHelper.castToDouble(data);
+        Optional<Integer> it;
+        if (dt.isPresent()) {
+            return dt.get();
+        }
+        if (db.isPresent()) {
+            it = CastHelper.castToInteger(data);
+            if (it.isPresent()) return it.get();
+            return db.get();
+        }
+        return data;
+    }
 }

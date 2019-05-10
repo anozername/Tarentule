@@ -58,14 +58,14 @@ public class TestIndex {
     @Path("/insert")
     public String insert() {
         insertion_test();
-        return "insertion ok";
+        return CSVReader.getWeights().toString();
        //return "pas insert car developpement";
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
-    public String getIndex(@Context UriInfo uriInfo) {
+    public String getIndex(@Context UriInfo uriInfo, @QueryParam("SELECT") List<String> select) {
         insertion_test();
         indexTMP.clear();
         notIndexTMP.clear();
@@ -112,8 +112,8 @@ public class TestIndex {
         }
         //return linesTMP.toString();
         /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
-        les 2 queries reoturnent le bon resultat mais ne se computent pas*/
-        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection).toString();
+        les 2 queries reoturnent le bon resultat mais ne se computent pas */
+        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(select).toString();
         else return linesTMP.toString();
     }
 
@@ -288,7 +288,8 @@ public class TestIndex {
 
     public void insertion_test() {
         List<Object[]> content = CSVReader.readLines();
-        int[] defineIndex = {4};
+        int[] defineIndex = new int[1];
+        defineIndex[0] = getIndiceMax(CSVReader.getWeights());
         Object[] attributes = content.remove(0);
         Object[] types = content.remove(content.size()-1);
         lines = new Lines(defineIndex, attributes, content, types);
@@ -309,6 +310,14 @@ public class TestIndex {
             }
         }
         return tmp;
+    }
+
+    public static int getIndiceMax(List<Double> list) {
+        Double max = list.get(0);
+        for (Double d : list) {
+            if (max < d) max = d;
+        }
+        return list.indexOf(max);
     }
 
 }

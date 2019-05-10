@@ -14,6 +14,13 @@ public class CSVReader {
     private static List<Object> types = new ArrayList<>();
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
 
+    private static List<Double> weights = new ArrayList<>();
+    private static List<String> valuesToCompare = new ArrayList<>();
+
+    public static List<Double> getWeights() {
+        return weights;
+    }
+
     public static List<Object[]> readLines() {
         posDateTime.clear();
         posDouble.clear();
@@ -46,6 +53,8 @@ public class CSVReader {
                 types.add("double");
                 for (int i=1; i<tmp.size(); i++) {
                     tmp.set(i, casting(tmp.get(i).toString(), i));
+                    weights.add(0.0);
+                    valuesToCompare.add(tmp.get(i).toString());
                 }
 
                 res.add(tmp.toArray());
@@ -58,6 +67,16 @@ public class CSVReader {
                 trip = line.split(cvsSplitBy);
                 tmp = new ArrayList<>(Arrays.asList(trip));
                 tmp.add(0, id);
+
+                for (int pos=0; pos<tmp.size(); pos++) {
+                    if (tmp.get(pos).toString().equals(valuesToCompare.get(pos))) {
+                        weights.set(pos, weights.get(pos) + 0.1);
+                    }
+                    else {
+                        weights.set(pos, weights.get(pos) - 0.04);
+                    }
+                    if ((Math.random() * ((100 - 1) + 1)) + 1 < 10) valuesToCompare.set(pos, tmp.get(pos).toString());
+                }
                 /*  dans le csv actuel:
                     3 7 13 15 16: pos integer value
                     2 3: pos date value
@@ -73,15 +92,6 @@ public class CSVReader {
                         //faire un truc mais en meme temps la position est connue en avance
                     }
                 }
-
-              /*  for (Integer i : posInteger) {
-                    try {
-                        tmp.set(i, Integer.parseInt(trip[i].toString()));
-                    }
-                    catch (Exception e) {
-                        //faire un truc mais en meme temps la position est connue en avance
-                    }
-                }*/
 
                 for (Integer i : posDouble) {
                     try {
@@ -112,8 +122,6 @@ public class CSVReader {
         return res;
     }
 
-    /* pourrait servir de test de cast pour determiner les positions castable en date */
-
     public static Object casting(String data, int i) {
         Optional<Date> dt = CastHelper.castToDate(data);
         Optional<Double> db = CastHelper.castToDouble(data);
@@ -123,11 +131,6 @@ public class CSVReader {
             types.add("date");
             return dt.get();
         }
-        /*if (it.isPresent()) {
-            posInteger.add(i);
-            types.add("integer");
-            return it.get();
-        }*/
         if (db.isPresent()) {
             posDouble.add(i);
             types.add("double");

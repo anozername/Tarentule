@@ -127,24 +127,29 @@ public class Lines extends ArrayList<Object[]> {
         return res;
     }
 
-    public Lines getLinesWithSelect(List<String> selection) {
-        ArrayList<Object[]> res = new ArrayList<Object[]>();
-        Object[] selectLine = new Object[selection.size()];
-        List<Integer> select = new ArrayList<>();
-        for (String attribute : selection) {
-            for (int i = 0; i < nameIndex.length; i++) {
-                if (attribute.equals(nameIndex[i].toString())) {
-                    select.add(i);
-                    break;
-                }
+    public int getPosName(String name) {
+        for (int i = 0; i < nameIndex.length; i++) {
+            if (name.equals(nameIndex[i].toString())) {
+                return i;
             }
         }
+        return -1;
+    }
+
+    public Lines getLinesWithSelect(List<String> selection) {
+        ArrayList<Object[]> res = new ArrayList<Object[]>();
+        Object[] selectLine;
+        int pos;
+        List<Integer> select = new ArrayList<>();
+        for (String attribute : selection) {
+            if ((pos = getPosName(attribute)) != -1 ) select.add(pos);
+        }
         for (Object[] line : this) {
-                for (int x = 0; x < select.size(); x++) {
-                    selectLine[x] = line[select.get(x)];
-                }
-                res.add(selectLine);
-                selectLine = new Object[selection.size()];
+            selectLine = new Object[select.size()];
+            for (int x = 0; x < select.size(); x++) {
+                selectLine[x] = line[select.get(x)];
+            }
+            res.add(selectLine);
             }
         return new Lines(res);
     }
