@@ -1,6 +1,8 @@
 package main.app.test;
 
 import main.app.core.entity.Account;
+import main.app.engine.LoadBalancer;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -40,4 +42,23 @@ public class TestEndpoint {
 		throw new RuntimeException("Mon erreur");
 	}
 
+	@GET
+	@Path("/json")
+	public Response json() {
+		return Response.status(Response.Status.OK).entity(new ResponseEndpoint(true)).build();
+	}
+
+	public class ResponseEndpoint {
+		Boolean response;
+		String app = "RESTFUL API - java index";
+		String id = "intellij";
+
+		ResponseEndpoint(Boolean response) {
+			setResponse(response);
+		}
+
+		void setResponse(Boolean response) {
+			this.response = response;
+		}
+	}
 }

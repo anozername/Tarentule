@@ -1,12 +1,20 @@
 package main.app.engine;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import main.Main;
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 
 public class LoadBalancer extends RecursiveTask<Long> {
     public LoadBalancer(){
-        System.out.println("Balancing...");
+        //System.out.println("Balancing...");
     }
 
     private int benchmarking(){
@@ -17,40 +25,53 @@ public class LoadBalancer extends RecursiveTask<Long> {
         return new ForkJoinPool(benchmarking());
     }
 
-    private long distribute() throws Exception{
+    private long distribute(){
         long join = 0;
-        //Nodes for a specific type of query
         List<Node> list = new ArrayList<>();
-        //On parcourt la query
         //TODO adapt to the query parsed
         for(int i = 0; i<5; i++){
-            //S'il s'agit d'un dossier, on crée une sous-tâche
             if(i%2==0){
-                //Nous créons donc un nouvel objet Node
-                //Qui se chargera de parcourir le fichier
                 Node node = new Node(true);
-                //Nous l'ajoutons à la liste des tâches en cours pour récupérer le résultat plus tard
                 list.add(node);
-                //C'est cette instruction qui lance l'action en tâche de fond
                 node.fork();
             }
         }
 
-        //Et, enfin, nous récupérons le résultat de toutes les tâches de fond
-        for(Node f : list)
+        for(Node f : list) {
             join += f.join();
+        }
 
-        //Nous renvoyons le résultat final
         return join;
     }
 
     protected Long compute() {
         long compute = 0;
+        List<Future<HttpResponse<JsonNode>>> futures = new ArrayList<>();
+
+        for (String externalAddresses : Main.externalNodes){
+            Future<HttpResponse<JsonNode>> future = Unirest.get("http://"+externalAddresses+"/test/engine").asJsonAsync();
+            futures.add(future);
+        }
+
         try {
-            compute = this.distribute();
+            compute += this.distribute();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        for(Future<HttpResponse<JsonNode>> future : futures){
+            try {
+                HttpResponse<JsonNode> response = future.get();
+                String result = response.getBody().getObject().toString();
+                System.out.println(result);
+                JSONObject jsonObj = new JSONObject(result);
+                Long response_long = jsonObj.getLong("response");
+                compute += response_long;
+            }
+            catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
         return compute;
     }
 }
