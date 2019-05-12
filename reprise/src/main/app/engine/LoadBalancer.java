@@ -3,68 +3,57 @@ package main.app.engine;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import main.Main;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
-import java.util.concurrent.RecursiveTask;
 
-public class LoadBalancer extends RecursiveTask<Long> {
+public class LoadBalancer {
+    private Map<String, JSONObject> neighborhood = new HashMap<>();
+
     public LoadBalancer(){
-        //System.out.println("Balancing...");
-    }
-
-    private int benchmarking(){
-        return Runtime.getRuntime().availableProcessors();
-    }
-
-    public ForkJoinPool pool(){
-        return new ForkJoinPool(benchmarking());
-    }
-
-    private long distribute(){
-        long join = 0;
-        List<Node> list = new ArrayList<>();
-        //TODO adapt to the query parsed
-        for(int i = 0; i<5; i++){
-            if(i%2==0){
-                Node node = new Node(true);
-                list.add(node);
-                node.fork();
+        System.out.println("Balancing...");
+        for (String externalAddresses : Main.externalNodes){
+            try {
+                neighborhood.put(externalAddresses , new JSONObject(Unirest.get("http://"+externalAddresses+"/test/network").asJson().getBody().getObject().toString()));
+            } catch (UnirestException e) {
+                e.printStackTrace();
             }
         }
-
-        for(Node f : list) {
-            join += f.join();
-        }
-
-        return join;
     }
 
-    protected Long compute() {
+    private int[] balance(JSONObject externalNode){
+        int beginning = 0;
+        int ending = 100;
+
+
+        return new int[]{beginning, ending};
+    }
+
+    public long distribute(){
+        //TODO parallelize ?
         long compute = 0;
         List<Future<HttpResponse<JsonNode>>> futures = new ArrayList<>();
 
-        for (String externalAddresses : Main.externalNodes){
-            Future<HttpResponse<JsonNode>> future = Unirest.get("http://"+externalAddresses+"/test/engine").asJsonAsync();
+        //TODO adapt to the query parsed
+
+        for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
+            int[] scope = balance(entry.getValue());
+            Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/engine/work").header("accept", "application/json").field("beginning", 0).field("ending", 100).asJsonAsync();
             futures.add(future);
         }
 
-        try {
-            compute += this.distribute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         for(Future<HttpResponse<JsonNode>> future : futures){
             try {
                 HttpResponse<JsonNode> response = future.get();
                 String result = response.getBody().getObject().toString();
-                System.out.println(result);
                 JSONObject jsonObj = new JSONObject(result);
-                Long response_long = jsonObj.getLong("response");
+                Long response_long = jsonObj.getLong("result");
                 compute += response_long;
             }
             catch (InterruptedException | ExecutionException e) {

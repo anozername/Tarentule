@@ -21,12 +21,12 @@ public class CSVReader {
         return weights;
     }
 
-    public static List<Object[]> readLines() {
+    public static List<Object[]> readLines(String file_path) {
         posDateTime.clear();
         posDouble.clear();
         posInteger.clear();
         types.clear();
-        String csvFile = "input.csv";
+        String csvFile = file_path;
         String line = "";
         String cvsSplitBy = ",";
         List<Object[]> res = new ArrayList<Object[]>();

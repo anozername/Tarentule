@@ -1,6 +1,8 @@
 package main.app.test;
 
 import main.app.engine.LoadBalancer;
+import main.app.engine.Node;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -17,27 +19,42 @@ public class TestEngine {
         LoadBalancer loadBalancer = new LoadBalancer();
 
         Long start = System.currentTimeMillis();
-        long result = loadBalancer.pool().invoke(loadBalancer); //compute()
+        long result = loadBalancer.distribute();
         Long end = System.currentTimeMillis();
 
         return Response.status(Response.Status.OK).entity(new ResponseEngine(end - start, result)).build();
     }
 
     public class ResponseEngine {
-        Long temps;
+        Long time;
         Long response;
 
-        ResponseEngine(Long temps, Long response) {
-            setTemps(temps);
-            setResponse(response);
-        }
-
-        void setTemps(Long temps) {
-            this.temps = temps;
-        }
-
-        void setResponse(Long response) {
+        ResponseEngine(Long time, Long response) {
+            this.time = time;
             this.response = response;
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED) //
+    @Path("/work")
+    public Response work(@FormParam("beginning") int beginning, @FormParam("ending") int ending) {
+        Node node = new Node(true,beginning,ending);
+
+        Long start = System.currentTimeMillis();
+        long result = node.pool().invoke(node); //compute()
+        Long end = System.currentTimeMillis();
+
+        return Response.status(Response.Status.OK).entity(new ResponseWork(end - start, result)).build();
+    }
+
+    public class ResponseWork {
+        long time;
+        long result;
+
+        ResponseWork(long time, long result) {
+            this.time = time;
+            this.result = result;
         }
     }
 }

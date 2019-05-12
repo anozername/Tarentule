@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 public class Main {
     public static List<String> externalNodes = new ArrayList<>();
+    public static String file_path;
 
     private static void jetty(int port) {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
@@ -70,7 +71,7 @@ public class Main {
         try {
             cmd = parser.parse(options, args);
 
-            String inputFilePath = cmd.getOptionValue("input_option");
+            file_path = cmd.getOptionValue("file");
             if(cmd.hasOption("port")) {
                 System.out.println(port_string);
                 port_string = cmd.getOptionValue("port");
@@ -94,6 +95,7 @@ public class Main {
             System.out.println(e.getMessage());
             System.exit(1);
         }
+        externalNodes.add("localhost:"+port);
 
         return port;
     }

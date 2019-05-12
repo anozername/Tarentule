@@ -1,5 +1,6 @@
 package main.app.test;
 
+import main.Main;
 import main.app.core.entity.*;
 
 import javax.ws.rs.*;
@@ -57,7 +58,7 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
     public String insert() {
-        insertion_test();
+        insertion_test(Main.file_path);
         return CSVReader.getWeights().toString();
        //return "pas insert car developpement";
     }
@@ -66,7 +67,7 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo, @QueryParam("SELECT") List<String> select) {
-        insertion_test();
+        insertion_test(Main.file_path);
         indexTMP.clear();
         notIndexTMP.clear();
         groupBy.clear();
@@ -286,8 +287,8 @@ public class TestIndex {
 
     /********************************************************		helpers		*/
 
-    public void insertion_test() {
-        List<Object[]> content = CSVReader.readLines();
+    public void insertion_test(String file_path) {
+        List<Object[]> content = CSVReader.readLines(file_path);
         int[] defineIndex = new int[1];
         defineIndex[0] = getIndiceMax(CSVReader.getWeights());
         Object[] attributes = content.remove(0);

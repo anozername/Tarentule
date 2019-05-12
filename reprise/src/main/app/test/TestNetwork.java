@@ -23,21 +23,11 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class TestNetwork {
     @GET
-    public Response getJsonResponse() {
-        String result = "";
-
-        try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.get("http://localhost:8081/test/engine").asJson();
-            result = jsonResponse.getBody().getObject().toString();
-            JSONObject jsonObj = new JSONObject(result);
-            Long response = jsonObj.getLong("response");
-            System.out.println(response);
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-
-        return Response.status(Response.Status.OK).entity(result).build();
+    public Response network() {
+        //Single
+        return Response.status(Response.Status.OK).entity(new ResponseNetwork()).build();
     }
+
     @GET
     @Path("/list")
     @Produces(MediaType.TEXT_HTML)
@@ -46,26 +36,37 @@ public class TestNetwork {
     }
 
     @GET
-    @Path("/json")
-    public Response json() {
-        return Response.status(Response.Status.OK).entity(new ResponseEngine(0L,100L)).build();
+    @Path("/benchmark")
+    public Response benchmark() {
+        //Total
+        int max_processor = 0;
+        long max_heap = 0;
+
+        for (String externalAddresses : Main.externalNodes){
+            try {
+                JSONObject response = new JSONObject(Unirest.get("http://"+externalAddresses+"/test/network").asJson().getBody().getObject().toString());
+                max_processor += response.getLong("processor");
+                max_heap += response.getLong("heap");
+            } catch (UnirestException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return Response.status(Response.Status.OK).entity(new ResponseNetwork(max_processor, max_heap)).build();
     }
 
-    public class ResponseEngine {
-        Long time;
-        Long response;
+    public class ResponseNetwork {
+        int processor;
+        long heap;
 
-        ResponseEngine(Long time, Long response) {
-            setTemps(time);
-            setResponse(response);
+        ResponseNetwork() {
+            this.processor = Runtime.getRuntime().availableProcessors();
+            this.heap = Runtime.getRuntime().freeMemory();
         }
 
-        void setTemps(Long time) {
-            this.time = time;
-        }
-
-        void setResponse(Long response) {
-            this.response = response;
+        ResponseNetwork(int max_processor, Long max_heap) {
+            this.processor = max_processor;
+            this.heap = max_heap;
         }
     }
 }
