@@ -57,8 +57,10 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
     public String insert() {
-        insertion_test();
-        return CSVReader.getWeights().toString();
+        //insertion_test();
+        CSVReader.readForIndexing(0,0);
+        return CSVReader.getIndexes().toString();
+        //return CSVReader.readForIndexing(0,0).toString();
        //return "pas insert car developpement";
     }
 
@@ -287,14 +289,17 @@ public class TestIndex {
     /********************************************************		helpers		*/
 
     public void insertion_test() {
-        List<Object[]> content = CSVReader.readLines();
-        int[] defineIndex = new int[1];
-        defineIndex[0] = getIndiceMax(CSVReader.getWeights());
-        Object[] attributes = content.remove(0);
-        Object[] types = content.remove(content.size()-1);
-        lines = new Lines(defineIndex, attributes, content, types);
-        index = new Index(lines);
-        index.putValues();
+        //HashMap content = CSVReader.readForIndexing(0, 0);
+        /*List<Integer> defineIndex = new ArrayList<>();
+        List<Object> namesIndex = CSVReader.getNameIndexes();
+        for (Object indexName : content.keySet()) {
+            defineIndex.add(namesIndex.indexOf(indexName));
+        }*/
+        //Object[] attributes = content.remove(0);
+        //Object[] types = content.remove(content.size()-1);
+        //lines = new Lines(defineIndex.toArray(), CSVReader.getNameIndexes().toArray(), content, CSVReader.getTypes().toArray());
+        //index = new Index(content);
+        //index.putValues();
     }
 
     //et

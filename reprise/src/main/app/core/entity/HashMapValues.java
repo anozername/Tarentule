@@ -40,4 +40,5 @@ public class HashMapValues extends HashMap<Object, ArrayList<Integer>> {
     public boolean hasValue(Object value) {
         return this.containsKey(value);
     }
+
 }
