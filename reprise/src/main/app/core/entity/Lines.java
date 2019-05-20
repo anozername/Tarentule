@@ -4,11 +4,11 @@ import java.util.*;
 
 public class Lines extends ArrayList<Object[]> {
     private static final int posID = 0;
-    private static int[] posIndex;
+    private static Integer[] posIndex;
     private static Object[] nameIndex;
     private static Object[] types;
 
-    public Lines(int[] posIndex, Object[] nameIndex, List<Object[]> lines, Object[] types) {
+    public Lines(Integer[] posIndex, Object[] nameIndex, List<Object[]> lines, Object[] types) {
         super();
         this.posIndex = posIndex;
         this.nameIndex = nameIndex;
@@ -33,7 +33,7 @@ public class Lines extends ArrayList<Object[]> {
         return res;
     }
 
-    public int[] getPosIndex() {
+    public Integer[] getPosIndex() {
         return posIndex;
     }
 

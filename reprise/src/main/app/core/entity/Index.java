@@ -7,12 +7,16 @@ import java.util.HashMap;
 public class Index {
 
     private Lines lines;
-    private static final HashMap<String, HashMapValues> hashmap = new HashMap<String, HashMapValues>();
+    private static HashMap<String, HashMapValues> hashmap;
 
     public Index(Lines lines) {
         this.lines = lines;
     }
-    
+
+    public Index(HashMap hashmap) {
+        this.hashmap = hashmap;
+    }
+
     public Lines getLines() {
     	return lines;
     }
