@@ -58,10 +58,8 @@ public class TestIndex {
     @Path("/insert")
     public String insert() {
         //insertion_test();
-        CSVReader.readForIndexing(0,0);
-        return CSVReader.getIndexes().toString();
-        //return CSVReader.readForIndexing(0,0).toString();
-       //return "pas insert car developpement";
+        //CSVReader.readForIndexing(0,0);
+        return "ok";
     }
 
     @GET

@@ -2,6 +2,8 @@ package main.app.core.search;
 
 import main.app.core.entity.HashMapValues;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,7 +13,7 @@ import java.text.SimpleDateFormat;
 
 public class CSVReader {
 
-    private static String csvFile = "input.csv";
+    private String csvFile = "input.csv";
     private static ArrayList<Integer> posDateTime = new ArrayList<>();
     private static ArrayList<Integer> posDouble = new ArrayList<>();
     private static ArrayList<Integer> posInteger = new ArrayList<>();
@@ -25,7 +27,7 @@ public class CSVReader {
     */
     private static HashMap<Object, Integer>[] indexes;
 
-    private static List<Object> nameIndexes;
+    private static List<String> nameIndexes;
 
     /*public static List<Double> getWeights() {
         return weights;
@@ -35,7 +37,11 @@ public class CSVReader {
         return changeValue;
     }*/
 
-    public static List<Object> getNameIndexes() {
+    public CSVReader(String csvFile) {
+        this.csvFile = csvFile;
+    }
+
+    public static List<String> getNameIndexes() {
         return nameIndexes;
     }
 
@@ -46,59 +52,76 @@ public class CSVReader {
     public static Map<Object, Integer>[] getIndexes() {
         return indexes;
     }
-    public static List<String> readForIndexing(int debut, int fin) {
+
+    public List<Object> read(Object[] line, Integer id) {
+        List<Object> tmp = new ArrayList<>(Arrays.asList(line));
+        tmp.add(0, id);
+        Optional<Integer> it;
+        for (Integer i : posDateTime) {
+            try {
+                tmp.set(i, sdf.parse(line.toString()));
+            }
+            catch (Exception e) {
+                //faire un truc mais en meme temps la position est connue en avance
+            }
+        }
+
+        for (Integer i : posDouble) {
+            try {
+                it = CastHelper.castToInteger(line[i].toString());
+                if (it.isPresent()) {
+                    tmp.set(i, Integer.parseInt(line[i].toString()));
+                }
+                else {
+                    tmp.set(i, Double.parseDouble(line[i].toString()));
+                }
+            }
+            catch (Exception e) {
+                //faire un truc mais en meme temps la position est connue en avance
+            }
+        }
+        return tmp;
+    }
+
+    public MultivaluedMap<Object, Integer>[] readForIndexing() {
         posDateTime.clear();
         posDouble.clear();
         posInteger.clear();
         types.clear();
 
-        HashMap hashMap = new HashMap();
-        List<String> posIndex = new ArrayList<>();
-        Object valTMP;
+        List<Integer> posIndex = new ArrayList<>();
         HashMap<Object, Integer> mapTMP = new HashMap<>();
-
+        Integer valueTMP;
+        Object valTMP;
         ArrayList<Integer> scoresTMP;
         String line = "";
         String cvsSplitBy = ",";
-        //List<Object[]> res = new ArrayList<Object[]>();
-
+        List<Object> tmp;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            Optional<Integer> it;
-            List<Object> tmp;
             Integer id = 1;
 
-            Integer valueTMP;
-            ArrayList<Integer> idsTMP;
-
-            line = br.readLine();
-            Object[] trip = line.split(cvsSplitBy);
-            tmp = new ArrayList<>(Arrays.asList(trip));
-            tmp.add(0, "id");
-            nameIndexes = new ArrayList<>(tmp);
-            //res.add(tmp.toArray());
-            indexes = new HashMap[tmp.size()];
-            tmp.clear();
-
-           /* pourrait servir au cas ou on decide de lire tous les csv
-               la deuxieme ligne servirait alors a determiner les index des types parsables */
+            line = "id," + br.readLine();
+            String[] trip = line.split(cvsSplitBy);
+            nameIndexes = new ArrayList<String>(Arrays.asList(trip));
+            indexes = new HashMap[trip.length];
 
             if ((line = br.readLine()) != null) {
+                line = id + "," + line;
                 trip = line.split(cvsSplitBy);
                 tmp = new ArrayList<>(Arrays.asList(trip));
                 tmp.add(0, id);
                 types.add("double");
-                mapTMP.put(id, 1);
-                indexes[0] = mapTMP;
-                for (int i=1; i<tmp.size(); i++) {
-                    valTMP = casting(tmp.get(i).toString(), i);
-                    tmp.set(i, casting(tmp.get(i).toString(), i));
+                for (int i=1; i<trip.length; i++) {
+                    valTMP = casting(trip[i], i);
+                    tmp.set(i, valTMP);
                     mapTMP = new HashMap<>();
-                    mapTMP.put(casting(tmp.get(i).toString(), i), 1);
+                    mapTMP.put(valTMP, 1);
                     indexes[i] = mapTMP;
                    /*  weights.add(0.0);
                     changeValue.add(0);
                     valuesToCompare.add(tmp.get(i).toString());*/
                 }
+                indexes[0] = null;
 
                 //res.add(tmp.toArray());
                 //tmp.clear();
@@ -106,66 +129,18 @@ public class CSVReader {
             }
 
             while ((line = br.readLine()) != null) {
-
-                trip = line.split(cvsSplitBy);
-                tmp = new ArrayList<>(Arrays.asList(trip));
-                tmp.add(0, id);
-
-                /* for (int pos=0; pos<tmp.size(); pos++) {
-                    if (tmp.get(pos).toString().equals(valuesToCompare.get(pos))) {
-                        weights.set(pos, weights.get(pos) + 0.1);
-                    }
-                    else {
-                        weights.set(pos, weights.get(pos) - 0.04);
-                        valuesToCompare.set(pos, tmp.get(pos).toString());
-                        changeValue.set(pos, changeValue.get(pos) + 1);
-                    }
-                    //if ((Math.random() * ((100 - 1) + 1)) + 1 < 10) valuesToCompare.set(pos, tmp.get(pos).toString());
-                }*/
-                /*  dans le csv actuel:
-                    3 7 13 15 16: pos integer value
-                    2 3: pos date value
-                    4 5 6 9 10 12 14: double value
-                    17: float value
-                 */
-                //l.set(3, Integer.parseInt(trip[3].toString()));
-                for (Integer i : posDateTime) {
-                    try {
-                        tmp.set(i, sdf.parse(tmp.get(i).toString()));
-                    }
-                    catch (Exception e) {
-                        //faire un truc mais en meme temps la position est connue en avance
-                    }
-                }
-
-                for (Integer i : posDouble) {
-                    try {
-                        it = CastHelper.castToInteger(tmp.get(i).toString());
-                        if (it.isPresent()) {
-                            tmp.set(i,  Integer.parseInt(tmp.get(i).toString()));
-                        }
-                        else {
-                            tmp.set(i,  Double.parseDouble(tmp.get(i).toString()));
-                        }
-                    }
-                    catch (Exception e) {
-                        //faire un truc mais en meme temps la position est connue en avance
-                    }
-                }
-                for (int pos=1; pos<indexes.length-1; pos++) {
+                line = id.toString() + "," + line;
+                tmp = new ArrayList<>(read(line.split(cvsSplitBy), id));
+                for (int pos=1; pos<indexes.length; pos++) {
                     //lun ou lautre mais pas les deux
                     //valueTMP = tmp.get(pos);
                     if (indexes[pos] != null) {
-                        mapTMP = new HashMap<>();
-                        //mapTMP.putAll(indexes[pos]);
                         if (!indexes[pos].containsKey(tmp.get(pos))) {
-                            mapTMP.put(tmp.get(pos), 1);
-                            indexes[pos] = mapTMP;
-                            //indexes[pos].compute(tmp.get(pos), (key, value) -> value = 1);
-                        }/* else {
+                            indexes[pos].put(tmp.get(pos), 1);
+                        } else {
                             valueTMP = indexes[pos].get(tmp.get(pos)) + 1;
                             indexes[pos].put(tmp.get(pos), valueTMP);
-                        }*/
+                        }
 
                     }
                 }
@@ -176,13 +151,13 @@ public class CSVReader {
             }
            // res.add(types.toArray());
             ArrayList<Integer> scores = new ArrayList<>(getScoresForIndexing());
-            //scores.remove(0);
+            scores.add(0, null);
             scoresTMP = new ArrayList<>(scores);
-            Integer min;
-            for (int nbIndex=0; nbIndex<1; nbIndex++) {
+            Object min;
+            for (int nbIndex=0; nbIndex<2; nbIndex++) {
                 min = min(scoresTMP);
                 //hashMap.put(nameIndexes.get(scores.indexOf(max)), scores.indexOf(max));
-                posIndex.add(scores.toString());
+                posIndex.add(scores.indexOf(min));
                 scoresTMP.remove(min);
             }
 
@@ -190,24 +165,63 @@ public class CSVReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return posIndex;
+        return readforHashMap(posIndex);
     }
 
-    public static void deleteFatMap() {
+    public void deleteFatMap() {
         for (int i=0; i<indexes.length; i++) {
-            if (indexes[i].size() > 11) indexes[i] = null;
+            if (indexes[i] != null) {
+                if (indexes[i].size() > 11) indexes[i] = null;
+            }
         }
     }
 
-    public static Integer min(List<Integer> scores) {
+    public Integer min(List<Integer> scores) {
         Integer min = scores.get(0);
+        for (int i=0; i<scores.size(); i++) {
+            if (scores.get(i) != null) {min = scores.get(i); break;}
+        }
         for (Integer score : scores) {
-            if (min > score) min = score;
+            if (score != null) {
+                if (min > score) min = score;
+            }
         }
         return min;
     }
 
-    public static List<Integer> getScoresForIndexing() {
+    public MultivaluedMap<Object, Integer>[] readforHashMap(List<Integer> listIndex) {
+        Object[] trip;
+        String line;
+        Integer id = 1;
+        List<Object> tmp;
+        String cvsSplitBy = ",";
+        List<Integer> ids;
+        MultivaluedMap<Object, Integer>[] index = new MultivaluedHashMap[listIndex.size()];
+        for (int indice=0; indice<listIndex.size(); indice++) index[indice] = new MultivaluedHashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            while ((line = br.readLine()) != null) {
+                tmp = new ArrayList<>(read(line.split(cvsSplitBy), id));
+                for (int i=0; i<listIndex.size(); i++) {
+                    if (index[i].containsKey(tmp.get(listIndex.get(i)))) {
+                        ids = index[i].get(tmp.get(listIndex.get(i)));
+                        ids.add(id);
+                    }
+                    else {
+                        ids = new ArrayList<>(id);
+                    }
+                    index[i].put(tmp.get(listIndex.get(i)), ids);
+                    //ids.clear();
+                }
+                id++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return index;
+
+    }
+
+    public List<Integer> getScoresForIndexing() {
         ArrayList<Integer> scores = new ArrayList<>();
         int max = -1;
         int min = -1;
@@ -221,12 +235,12 @@ public class CSVReader {
                 max = -1;
                 min = -1;
             }
-            else scores.add(999999999);
+            else scores.add(null);
         }
         return scores;
     }
 
-    public static Object casting(String data, int i) {
+    public Object casting(String data, int i) {
         Optional<Date> dt = CastHelper.castToDate(data);
         Optional<Double> db = CastHelper.castToDouble(data);
         Optional<Integer> it = CastHelper.castToInteger(data);
