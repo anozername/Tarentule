@@ -16,7 +16,7 @@ public class Index {
     public Index(HashMap hashmap) {
         this.hashmap = hashmap;
     }
-    
+
     public Lines getLines() {
     	return lines;
     }

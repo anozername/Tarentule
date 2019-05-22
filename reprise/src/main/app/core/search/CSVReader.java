@@ -1,5 +1,6 @@
 package main.app.core.search;
 
+import main.Main;
 import main.app.core.entity.HashMapValues;
 
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -13,7 +14,7 @@ import java.text.SimpleDateFormat;
 
 public class CSVReader {
 
-    private String csvFile = "input.csv";
+    private String csvFile = Main.file_path;
     private static ArrayList<Integer> posDateTime = new ArrayList<>();
     private static ArrayList<Integer> posDouble = new ArrayList<>();
     private static ArrayList<Integer> posInteger = new ArrayList<>();

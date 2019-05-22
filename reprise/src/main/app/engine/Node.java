@@ -2,15 +2,32 @@ package main.app.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 public class Node extends RecursiveTask<Long> {
     private long result = 0;
-    private boolean balance;
+    private boolean balanced;
+    private int beginning;
+    private int ending;
 
-    Node(boolean balanced){
-        balance = balanced;
-        //System.out.println(balance+" noding..."); // bad pun, very bad pun
+    private Node(boolean balanced){
+        this.balanced = balanced;
+        System.out.println(balanced+" nodding..."); // bad pun
+    }
+    public Node(boolean balanced, int beginning, int ending){
+        this.balanced = balanced;
+        this.beginning = beginning;
+        this.ending = ending;
+        System.out.println(balanced+" nodding from "+this.beginning+" to "+this.ending+"."); // very bad pun
+    }
+
+    private int benchmarking(){
+        return Runtime.getRuntime().availableProcessors();
+    }
+
+    public ForkJoinPool pool(){
+        return new ForkJoinPool(benchmarking());
     }
 
     private long work(){
@@ -42,7 +59,7 @@ public class Node extends RecursiveTask<Long> {
     protected Long compute() {
         long compute = 0;
         try {
-            if ( balance){
+            if (balanced){
                 compute = this.divide();
             }
             else {

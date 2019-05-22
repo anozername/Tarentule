@@ -1,5 +1,6 @@
 package main.app.test;
 
+import main.Main;
 import main.app.core.entity.*;
 
 import javax.ws.rs.*;
