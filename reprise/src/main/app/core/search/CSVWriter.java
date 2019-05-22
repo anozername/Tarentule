@@ -1,4 +1,6 @@
 package main.app.core.search;
+import main.Main;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;

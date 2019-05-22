@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 
 public class CSVReader {
 
-    private String csvFile = Main.file_path;
+    private String csvFile;
     private static ArrayList<Integer> posDateTime = new ArrayList<>();
     private static ArrayList<Integer> posDouble = new ArrayList<>();
     private static ArrayList<Integer> posInteger = new ArrayList<>();
@@ -56,7 +56,7 @@ public class CSVReader {
 
     public List<Object> read(Object[] line, Integer id) {
         List<Object> tmp = new ArrayList<>(Arrays.asList(line));
-        tmp.add(0, id);
+       // tmp.add(0, id);
         Optional<Integer> it;
         for (Integer i : posDateTime) {
             try {
@@ -107,12 +107,10 @@ public class CSVReader {
             indexes = new HashMap[trip.length];
 
             if ((line = br.readLine()) != null) {
-                line = id + "," + line;
+                line = id.toString() + "," + line;
                 trip = line.split(cvsSplitBy);
                 tmp = new ArrayList<>(Arrays.asList(trip));
-                tmp.add(0, id);
-                types.add("double");
-                for (int i=1; i<trip.length; i++) {
+                for (int i=0; i<trip.length; i++) {
                     valTMP = casting(trip[i], i);
                     tmp.set(i, valTMP);
                     mapTMP = new HashMap<>();
@@ -125,7 +123,7 @@ public class CSVReader {
                 indexes[0] = null;
 
                 //res.add(tmp.toArray());
-                //tmp.clear();
+                tmp.clear();
                 id++;
             }
 
@@ -154,11 +152,22 @@ public class CSVReader {
             ArrayList<Integer> scores = new ArrayList<>(getScoresForIndexing());
             scores.add(0, null);
             scoresTMP = new ArrayList<>(scores);
-            Object min;
+            Integer min;
+            Integer indexmin;
+            Integer position;
             for (int nbIndex=0; nbIndex<2; nbIndex++) {
                 min = min(scoresTMP);
+                indexmin = scores.indexOf(min);
                 //hashMap.put(nameIndexes.get(scores.indexOf(max)), scores.indexOf(max));
-                posIndex.add(scores.indexOf(min));
+                while (posIndex.contains(indexmin)) {
+                    position = indexmin;
+                    indexmin = scores.indexOf(min(scores.subList(position + 1, scores.size()))) + position;
+                    System.out.println("ok " + scores.subList(position + 1, scores.size()));
+                    System.out.println("ok " + indexmin);
+                }
+                posIndex.add(indexmin);
+                System.out.println(scoresTMP);
+                System.out.println("\n" + scores);
                 scoresTMP.remove(min);
             }
 
@@ -196,22 +205,22 @@ public class CSVReader {
         Integer id = 1;
         List<Object> tmp;
         String cvsSplitBy = ",";
-        List<Integer> ids;
+        //List<Integer> ids = new ArrayList<>();
         MultivaluedMap<Object, Integer>[] index = new MultivaluedHashMap[listIndex.size()];
         for (int indice=0; indice<listIndex.size(); indice++) index[indice] = new MultivaluedHashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((line = br.readLine()) != null) {
+                line = id.toString() + "," + line;
                 tmp = new ArrayList<>(read(line.split(cvsSplitBy), id));
                 for (int i=0; i<listIndex.size(); i++) {
                     if (index[i].containsKey(tmp.get(listIndex.get(i)))) {
-                        ids = index[i].get(tmp.get(listIndex.get(i)));
-                        ids.add(id);
+                        index[i].add(tmp.get(listIndex.get(i)), id);
+                        System.out.println(id);
                     }
                     else {
-                        ids = new ArrayList<>(id);
+                        index[i].putSingle(tmp.get(listIndex.get(i)), id);
                     }
-                    index[i].put(tmp.get(listIndex.get(i)), ids);
-                    //ids.clear();
+
                 }
                 id++;
             }
