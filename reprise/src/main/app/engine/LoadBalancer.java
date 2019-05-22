@@ -6,14 +6,13 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.Main;
 import org.json.JSONObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class LoadBalancer {
+    private int fake_nb_lines = 16000;
     private Map<String, JSONObject> neighborhood = new HashMap<>();
 
     public LoadBalancer(){
@@ -25,12 +24,18 @@ public class LoadBalancer {
                 e.printStackTrace();
             }
         }
+
     }
 
-    private int[] balance(JSONObject externalNode){
-        int beginning = 0;
-        int ending = 100;
+    private int[] balance(int last, int max, int processors){
+        int beginning = last+1; //skip line 0 (header) / 1 (usually blank)
 
+        System.out.println(processors);
+        int ending = beginning + processors*(fake_nb_lines/max);
+        //TODO check first & last lines
+
+        if (ending + fake_nb_lines/max > fake_nb_lines)
+                ending = fake_nb_lines;
 
         return new int[]{beginning, ending};
     }
@@ -42,9 +47,15 @@ public class LoadBalancer {
 
         //TODO adapt to the query parsed
 
+        int max = 0;
+        for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) { //TODO opti
+            max += entry.getValue().getLong("processor");
+        }
+        System.out.println("total proco : "+max);
+        int[] scope = new int[]{0, 0};
         for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
-            int[] scope = balance(entry.getValue());
-            Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/engine/work").header("accept", "application/json").field("beginning", 0).field("ending", 100).asJsonAsync();
+            scope = balance(scope[1], max, entry.getValue().getInt("processor"));
+            Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/engine/work").header("accept", "application/json").field("beginning", scope[0]).field("file", "file.csv").field("ending", scope[1]).asJsonAsync();
             futures.add(future);
         }
 

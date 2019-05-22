@@ -38,7 +38,7 @@ public class TestEngine {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED) //
     @Path("/work")
-    public Response work(@FormParam("beginning") int beginning, @FormParam("ending") int ending) {
+    public Response work(@FormParam("beginning") int beginning, @FormParam("file") String file, @FormParam("ending") int ending) {
         Node node = new Node(true,beginning,ending);
 
         Long start = System.currentTimeMillis();
