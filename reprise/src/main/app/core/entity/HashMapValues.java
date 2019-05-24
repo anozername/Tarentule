@@ -1,34 +1,35 @@
-package main.app.core.entity;
+/*package main.app.core.entity;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
 import java.util.*;
 
-public class HashMapValues extends HashMap<Object, ArrayList<Integer>> {
+public class HashMapValues extends MultivaluedMap<Object, Integer> {
     public HashMapValues() {
         super();
     }
 
-    /*public Integer[] put(int value, Integer[] ids) {
-        return this.put(value, ids);
-    }
- 
-    public Integer[] put(float value, Integer[] ids) {
-        return this.put(value, ids);
-    }
-    
-    public Integer[] put(String value, Integer[] ids) {
-        return this.put(value, ids);
-    }
-    
-    public Integer[] put(Date value, Integer[] ids) {
-        return this.put(value, ids);
+    @Override
+    public void putSingle(Object key, Integer value) {
+        put(key, new ArrayList<>(value));
     }
 
-    public ArrayList<Integer> put(Object value, ArrayList<Integer> ids) {
-        return this.put(value, ids);
-    }*/
+    @Override
+    public void add(Object key, Integer value) {
+        add(key, value);
+    }
 
-    public ArrayList<Integer> findInHashMapValues(Object key) {
+    @Override
+    public Integer getFirst(Object key) {
+        return getFirst(key);
+    }
+
+    @Override
+    public Integer addAll(K key, List<V> valueList) {
+        return getFirst(key);
+    }
+
+    public List<Integer> findInHashMapValues(Object key) {
         for (Object val : keySet()) {
             if (val.equals(key)) {
                 return get(val);
@@ -41,4 +42,4 @@ public class HashMapValues extends HashMap<Object, ArrayList<Integer>> {
         return this.containsKey(value);
     }
 
-}
+}*/

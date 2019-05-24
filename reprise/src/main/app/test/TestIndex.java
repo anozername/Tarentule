@@ -9,9 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.File;
 
-import main.app.core.search.CSVReader;
-import main.app.core.search.CastHelper;
-import main.app.core.search.Results;
+import main.app.core.search.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -21,7 +19,6 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 @Consumes(MediaType.APPLICATION_JSON)
 public class TestIndex {
     private static Index index;
-    private static Lines lines;
     private static List<String> selection = new ArrayList<>();
     private static List<String> groupBy = new ArrayList<>();
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
@@ -73,7 +70,6 @@ public class TestIndex {
         groupBy.clear();
         selection.clear();
         int acc = 1;
-        index.setLines(lines);
         Results tmp = new Results();
         Lines linesTMP = new Lines();
         Map<String,List<Integer>> queriesWithoutIndex = new HashMap<>();
@@ -86,10 +82,10 @@ public class TestIndex {
             else {
                 tmp = new Results(index.getValueWithIndex(query.getKey(), query.getValue()[0]));
             }
-            index.setLines(index.getLines().getLines(tmp));
+            //peut etre set des lines pour recherche ici => creer fct param lines dans csvfinder
             acc++;
         }
-        linesTMP.addAll(lines.getLines(tmp));
+        linesTMP.addAll(index.findWithIDS(tmp));
         if (!notIndexTMP.isEmpty()) {
             if (acc != 1) {
                 linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy).computeResults(linesTMP);
@@ -108,7 +104,7 @@ public class TestIndex {
             */
 
             if (!groupBy.isEmpty()) {
-                linesTMP = new Lines(index.getLines().getLinesFormatted(tmp, groupBy));
+                linesTMP = linesTMP.getLinesFormatted(tmp, groupBy);
             }
         }
         //return linesTMP.toString();
@@ -157,16 +153,16 @@ public class TestIndex {
 
     public static void parser(MultivaluedMap<String,String> queryParams) {
         Object[] numbers;
-        Object[] attributes = index.getLines().getNameIndex();
+        List<String> attributes = CSVHelper.getNameIndexes();
         MultivaluedMap<String, List<Object>> mapTMP = new MultivaluedHashMap<>();
         Map.Entry<String, Object[]> entryTMP =  new AbstractMap.SimpleEntry<>(null, null);
         for (Map.Entry<String, List<String>> queries : queryParams.entrySet()) {
             if (queries.getKey().equals("SELECT")) selection = queries.getValue();
             if (queries.getKey().equals("GROUPBY")) groupBy.addAll(queries.getValue());
             else {
-                for (int i = 0; i < attributes.length; i++) {
-                    if (queries.getKey().equals(attributes[i].toString())) {
-                        switch (index.getLines().getTypes()[i].toString()) {
+                for (int i = 0; i < attributes.size(); i++) {
+                    if (queries.getKey().equals(attributes.get(i))) {
+                        switch (CSVHelper.getTypes().get(i).toString()) {
                             case "date":
                                 entryTMP = castToDateMap(queries);
                                 queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
@@ -288,17 +284,12 @@ public class TestIndex {
     /********************************************************		helpers		*/
 
     public void insertion_test() {
-        //HashMap content = CSVReader.readForIndexing(0, 0);
-        /*List<Integer> defineIndex = new ArrayList<>();
-        List<Object> namesIndex = CSVReader.getNameIndexes();
-        for (Object indexName : content.keySet()) {
-            defineIndex.add(namesIndex.indexOf(indexName));
-        }*/
-        //Object[] attributes = content.remove(0);
-        //Object[] types = content.remove(content.size()-1);
-        //lines = new Lines(defineIndex.toArray(), CSVReader.getNameIndexes().toArray(), content, CSVReader.getTypes().toArray());
-        //index = new Index(content);
-        //index.putValues();
+        CSVHelper.determineColumnsAndTypes();
+        String file = "test.csv";
+        CSVWriter writer = new CSVWriter(file);
+        writer.writeCSVFile(1, 10);
+        CSVReader reader = new CSVReader(file);
+        index = new Index(file, reader.readForIndexing());
     }
 
     //et

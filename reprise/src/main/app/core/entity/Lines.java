@@ -49,7 +49,7 @@ public class Lines extends ArrayList<Object[]> {
         return types;
     }
 
-    public int getPosNameIndex(Object name) {
+    public static int getPosNameIndex(Object name) {
         for (int i = 0; i < nameIndex.length; i++) {
             if (name.equals(nameIndex[i])) {
                 return i;
@@ -58,7 +58,7 @@ public class Lines extends ArrayList<Object[]> {
         return -1;
     }
 
-    public int getIndiceForAttribute(String attribute) {
+    public static int getIndiceForAttribute(String attribute) {
         for (int i = 0; i < nameIndex.length; i++) {
             if (attribute.equals(nameIndex[i].toString())) {
                 return i;
@@ -87,7 +87,7 @@ public class Lines extends ArrayList<Object[]> {
         return new Lines(res);
     }
 
-    public List<Object[]> getLinesFormatted(List<Integer> ids, List<String> groupBy) {
+    public Lines getLinesFormatted(List<Integer> ids, List<String> groupBy) {
         List<List<Object[]>> groupedRes = new ArrayList<>();
         ArrayList<Object[]> res;
         List<Integer> indicesGroup = new ArrayList<>();
@@ -124,7 +124,7 @@ public class Lines extends ArrayList<Object[]> {
         for (List<Object[]> l : groupedRes) {
             res.addAll(l);
         }
-        return res;
+        return new Lines(res);
     }
 
     public int getPosName(String name) {
