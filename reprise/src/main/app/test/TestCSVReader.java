@@ -25,8 +25,10 @@ public class TestCSVReader {
     public static void main(String[] args) {
         MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
         List<String> select = new ArrayList<>();
-        queryParams.add("passenger_count", "1");
-        queryParams.add("trip_distance", "1.9");
+        queryParams.add("passenger_count", "3");
+        queryParams.add("SELECT", "VendorID");
+        queryParams.add("SELECT", "id");
+        queryParams.add("GROUPBY", "tolls_amount");
         System.out.println(getIndex(queryParams, select));
     }
 
@@ -52,15 +54,15 @@ public class TestCSVReader {
             acc++;
         }
         linesTMP.addAll(index.findWithIDS(tmp));
+        linesTMP.cast();
         if (!notIndexTMP.isEmpty()) {
             if (acc != 1) {
-                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy).computeResults(linesTMP);
+                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy, linesTMP).computeResults(linesTMP);
             }
             else {
-                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy);
+                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy, linesTMP);
             }
             acc++;
-            System.out.println(index.getWithoutIndexGroupBy(notIndexTMP, groupBy));
         }
         else {
 
@@ -77,7 +79,7 @@ public class TestCSVReader {
         //return linesTMP.toString();
         /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
         les 2 queries reoturnent le bon resultat mais ne se computent pas */
-        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(select).toString();
+        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection).toString();
         else return linesTMP.toString();
     }
 

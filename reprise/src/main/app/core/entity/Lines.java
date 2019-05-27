@@ -1,5 +1,8 @@
 package main.app.core.entity;
 
+import main.app.core.search.CSVHelper;
+import main.app.core.search.CastHelper;
+
 import java.util.*;
 
 public class Lines extends ArrayList<Object[]> {
@@ -33,6 +36,14 @@ public class Lines extends ArrayList<Object[]> {
         return res;
     }
 
+    public void cast() {
+        int acc = 0;
+        for (Object[] line : this) {
+            set(acc, CSVHelper.read(line).toArray());
+            acc++;
+        }
+    }
+
     public Integer[] getPosIndex() {
         return posIndex;
     }
@@ -58,14 +69,6 @@ public class Lines extends ArrayList<Object[]> {
         return -1;
     }
 
-    public static int getIndiceForAttribute(String attribute) {
-        for (int i = 0; i < nameIndex.length; i++) {
-            if (attribute.equals(nameIndex[i].toString())) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     /********************************************************		insert		*/
 
@@ -96,7 +99,7 @@ public class Lines extends ArrayList<Object[]> {
         Object[] line;
         //if (groupBy.size() == 1 && groupBy.get(0).equals(()))
         for (String attribute : groupBy) {
-            indicesGroup.add(getIndiceForAttribute(attribute));
+            indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
         for (Integer it : ids) {
             if ((line = rechercheDicho(it)) != null) {
@@ -142,8 +145,10 @@ public class Lines extends ArrayList<Object[]> {
         int pos;
         List<Integer> select = new ArrayList<>();
         for (String attribute : selection) {
-            if ((pos = getPosName(attribute)) != -1 ) select.add(pos);
+            if ((pos = CSVHelper.getNameIndexes().indexOf(attribute)) != -1 ) select.add(pos);
+
         }
+
         for (Object[] line : this) {
             selectLine = new Object[select.size()];
             for (int x = 0; x < select.size(); x++) {

@@ -25,25 +25,27 @@ public class Index {
     	return hashmap.get(attribute);
     }
 
-    public Lines getWithoutIndexGroupBy(Map<String, Object[]> queries, List<String> groupBy) {
-        if(groupBy.isEmpty()) {
-            return new Lines(finder.getValueWithoutIndex(queries));
-        }
-        return new Lines(finder.getValueWithoutIndexGB(queries, groupBy));
-    }
 
     public Lines getWithoutIndexGroupBy(Map<String, Object[]> queries, List<String> groupBy, List<Object[]> lines) {
-        if(groupBy.isEmpty()) {
-            return new Lines(finder.getValueWithoutIndex(queries, lines));
+        if (lines.isEmpty()) {
+            if(groupBy.isEmpty()) {
+                return new Lines(finder.getValueWithoutIndex(queries));
+            }
+            return new Lines(finder.getValueWithoutIndexGB(queries, groupBy));
         }
-        return new Lines(finder.getValueWithoutIndexGB(queries, groupBy, lines));
+        else {
+            if (groupBy.isEmpty()) {
+                return new Lines(finder.getValueWithoutIndex(queries, lines));
+            }
+            return new Lines(finder.getValueWithoutIndexGB(queries, groupBy, lines));
+        }
     }
 
     public List<Integer> getValueWithIndex(String key, Object value) {
         return findInHashMap(key).get(value);
     }
 
-    public Lines findWithIDS(List<Integer> ids) {
+    public List<Object[]> findWithIDS(List<Integer> ids) {
         return finder.findLinesWithIds(ids);
     }
 

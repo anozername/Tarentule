@@ -55,16 +55,15 @@ public class TestIndex {
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
     public String insert() {
-        //insertion_test();
-        //CSVReader.readForIndexing(0,0);
-        return "ok";
+        insertion_test();
+        return "insertion ok";
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@Context UriInfo uriInfo, @QueryParam("SELECT") List<String> select) {
-        insertion_test();
+        //insertion_test();
         indexTMP.clear();
         notIndexTMP.clear();
         groupBy.clear();
@@ -72,7 +71,6 @@ public class TestIndex {
         int acc = 1;
         Results tmp = new Results();
         Lines linesTMP = new Lines();
-        Map<String,List<Integer>> queriesWithoutIndex = new HashMap<>();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
         parser(queryParams);
         for (Map.Entry<String, Object[]> query : indexTMP.entrySet()) {
@@ -86,12 +84,13 @@ public class TestIndex {
             acc++;
         }
         linesTMP.addAll(index.findWithIDS(tmp));
+        linesTMP.cast();
         if (!notIndexTMP.isEmpty()) {
             if (acc != 1) {
-                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy).computeResults(linesTMP);
+                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy, linesTMP).computeResults(linesTMP);
             }
             else {
-                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy);
+                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy, linesTMP);
             }
             acc++;
         }
@@ -110,7 +109,7 @@ public class TestIndex {
         //return linesTMP.toString();
         /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
         les 2 queries reoturnent le bon resultat mais ne se computent pas */
-        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(select).toString();
+        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection).toString();
         else return linesTMP.toString();
     }
 
@@ -287,7 +286,7 @@ public class TestIndex {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(1, 10);
+        writer.writeCSVFile(1, 100000);
         CSVReader reader = new CSVReader(file);
         index = new Index(file, reader.readForIndexing());
     }

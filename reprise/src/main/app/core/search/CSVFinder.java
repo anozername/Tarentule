@@ -22,7 +22,7 @@ public class CSVFinder {
         this.csvFile = fileName;
     }
 
-    public Lines findLinesWithIds(List<Integer> ids) {
+    public List<Object[]> findLinesWithIds(List<Integer> ids) {
         List<Object[]> res = new ArrayList<Object[]>();
         Object[] trip;
         List<Object> tmp;
@@ -37,7 +37,7 @@ public class CSVFinder {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new Lines(linesTMP);
+        return linesTMP;
     }
 
     public List<Object[]> getValueWithoutIndex(Map<String, Object[]> queries){
@@ -79,7 +79,7 @@ public class CSVFinder {
         int friend = 0;
         boolean added = false;
         for (String attribute : groupBy) {
-            indicesGroup.add(Lines.getIndiceForAttribute(attribute));
+            indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
         for (Object[] line : lines) {
             satisfaction = getSatisfaction(queries, line);
@@ -120,7 +120,7 @@ public class CSVFinder {
         List<Object> line;
         boolean added = false;
         for (String attribute : groupBy) {
-            indicesGroup.add(Lines.getIndiceForAttribute(attribute));
+            indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((lineSTR = br.readLine()) != null) {
