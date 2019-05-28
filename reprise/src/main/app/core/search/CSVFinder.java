@@ -9,10 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CSVFinder {
     private String csvFile;
@@ -40,16 +37,16 @@ public class CSVFinder {
         return linesTMP;
     }
 
-    public List<Object[]> getValueWithoutIndex(Map<String, Object[]> queries){
+    public List<Object[]> getValueWithoutIndex(Map<String, Object> queries, int compute){
         List<Object[]> res = new ArrayList<>();
-        int satisfaction;
+        boolean satisfaction;
         String lineSTR;
         List<Object> line;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((lineSTR = br.readLine()) != null) {
                 line = CSVHelper.read(lineSTR.split(cvsSplitBy));
-                satisfaction = getSatisfaction(queries, line.toArray());
-                if (satisfaction == queries.size()) {
+                satisfaction = getSatisfaction(queries, line.toArray(), compute);
+                if (satisfaction) {
                     res.add(line.toArray());
                 }
             }
@@ -59,31 +56,31 @@ public class CSVFinder {
         return res;
     }
 
-    public List<Object[]> getValueWithoutIndex(Map<String, Object[]> queries, List<Object[]> lines){
+    public List<Object[]> getValueWithoutIndex(Map<String, Object> queries, List<Object[]> lines, int compute){
         List<Object[]> res = new ArrayList<>();
-        int satisfaction;
+        boolean satisfaction;
         for (Object[] line : lines) {
-                satisfaction = getSatisfaction(queries, line);
-                if (satisfaction == queries.size()) {
+                satisfaction = getSatisfaction(queries, line, compute);
+                if (satisfaction) {
                     res.add(line);
                 }
         }
         return res;
     }
 
-    public List<Object[]> getValueWithoutIndexGB(Map<String, Object[]> queries, List<String> groupBy, List<Object[]> lines){
+    public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queries, List<String> groupBy, List<Object[]> lines, int compute){
         List<List<Object[]>> groupedRes = new ArrayList<>();
         List<Object[]> res;
         List<Integer> indicesGroup = new ArrayList<>();
-        int satisfaction;
+        boolean satisfaction;
         int friend = 0;
         boolean added = false;
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
         for (Object[] line : lines) {
-            satisfaction = getSatisfaction(queries, line);
-            if (satisfaction == queries.size()) {
+            satisfaction = getSatisfaction(queries, line, compute);
+            if (satisfaction) {
                 for (List<Object[]> group : groupedRes) {
                     for (Integer i : indicesGroup) {
                         if (line[i].equals(group.get(0)[i])) friend++;
@@ -110,11 +107,11 @@ public class CSVFinder {
         return res;
     }
 
-    public List<Object[]> getValueWithoutIndexGB(Map<String, Object[]> queries, List<String> groupBy){
+    public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queries, List<String> groupBy, int compute){
         List<List<Object[]>> groupedRes = new ArrayList<>();
         List<Object[]> res;
         List<Integer> indicesGroup = new ArrayList<>();
-        int satisfaction;
+        boolean satisfaction;
         int friend = 0;
         String lineSTR;
         List<Object> line;
@@ -125,8 +122,8 @@ public class CSVFinder {
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((lineSTR = br.readLine()) != null) {
                 line = CSVHelper.read(lineSTR.split(cvsSplitBy));
-                satisfaction = getSatisfaction(queries, line.toArray());
-                if (satisfaction == queries.size()) {
+                satisfaction = getSatisfaction(queries, line.toArray(), compute);
+                if (satisfaction) {
                     for (List<Object[]> group : groupedRes) {
                         for (Integer i : indicesGroup) {
                             if (line.get(i).equals(group.get(0)[i])) friend++;
@@ -156,14 +153,21 @@ public class CSVFinder {
         return res;
     }
 
-    public static int getSatisfaction(Map<String, Object[]> queries, Object[] line) {
+    public static boolean getSatisfaction(Map<String, Object> queries, Object[] line, int compute) {
         int satisfaction = 0;
-        for (Map.Entry<String, Object[]> query : queries.entrySet()) {
-            //0 car seule la premiere entree est consideree pour l instant
-            if (line[CSVHelper.getNameIndexes().indexOf(query.getKey())].equals(query.getValue()[0])) {
-                satisfaction++;
-            } else break;
+        String[] splitentry;
+        for (Map.Entry<String, Object> querie : queries.entrySet()) {
+            if (compute == 1) {
+                if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
+                    return true;
+                }
+            }
+            if (compute == 2) {
+                if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
+                    satisfaction++;
+                } else break;
+            }
         }
-        return satisfaction;
+        return satisfaction == queries.size();
     }
 }

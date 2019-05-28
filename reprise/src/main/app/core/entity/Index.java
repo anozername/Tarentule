@@ -25,19 +25,25 @@ public class Index {
     	return hashmap.get(attribute);
     }
 
+    public Lines getWithoutIndexGroupBy(Map<String, Object> queries, List<String> groupBy, int compute) {
+        if(groupBy.isEmpty()) {
+            return new Lines(finder.getValueWithoutIndex(queries, compute));
+        }
+        return new Lines(finder.getValueWithoutIndexGB(queries, groupBy, compute));
+    }
 
-    public Lines getWithoutIndexGroupBy(Map<String, Object[]> queries, List<String> groupBy, List<Object[]> lines) {
+    public Lines getWithoutIndexGroupBy(Map<String, Object> queries, List<String> groupBy, int compute, List<Object[]> lines) {
         if (lines.isEmpty()) {
             if(groupBy.isEmpty()) {
-                return new Lines(finder.getValueWithoutIndex(queries));
+                return new Lines(finder.getValueWithoutIndex(queries, compute));
             }
-            return new Lines(finder.getValueWithoutIndexGB(queries, groupBy));
+            return new Lines(finder.getValueWithoutIndexGB(queries, groupBy, compute));
         }
         else {
             if (groupBy.isEmpty()) {
-                return new Lines(finder.getValueWithoutIndex(queries, lines));
+                return new Lines(finder.getValueWithoutIndex(queries, lines, compute));
             }
-            return new Lines(finder.getValueWithoutIndexGB(queries, groupBy, lines));
+            return new Lines(finder.getValueWithoutIndexGB(queries, groupBy, lines, compute));
         }
     }
 

@@ -18,13 +18,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TestIndex {
-    private static Index index;
-    private static List<String> selection = new ArrayList<>();
-    private static List<String> groupBy = new ArrayList<>();
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-    private static Map<String, Object[]> queriesTMP = new HashMap<>();
-    private static Map<String, Object[]> indexTMP = new HashMap<>();
-    private static Map<String, Object[]> notIndexTMP = new HashMap<>();
+    private static Parser parser;
+
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -62,55 +57,8 @@ public class TestIndex {
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
-    public String getIndex(@Context UriInfo uriInfo, @QueryParam("SELECT") List<String> select) {
-        //insertion_test();
-        indexTMP.clear();
-        notIndexTMP.clear();
-        groupBy.clear();
-        selection.clear();
-        int acc = 1;
-        Results tmp = new Results();
-        Lines linesTMP = new Lines();
-        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        parser(queryParams);
-        for (Map.Entry<String, Object[]> query : indexTMP.entrySet()) {
-            if (acc != 1) {
-                tmp = tmp.computeResults(index.getValueWithIndex(query.getKey(), query.getValue()[0]));
-            }
-            else {
-                tmp = new Results(index.getValueWithIndex(query.getKey(), query.getValue()[0]));
-            }
-            //peut etre set des lines pour recherche ici => creer fct param lines dans csvfinder
-            acc++;
-        }
-        linesTMP.addAll(index.findWithIDS(tmp));
-        linesTMP.cast();
-        if (!notIndexTMP.isEmpty()) {
-            if (acc != 1) {
-                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy, linesTMP).computeResults(linesTMP);
-            }
-            else {
-                linesTMP = index.getWithoutIndexGroupBy(notIndexTMP, groupBy, linesTMP);
-            }
-            acc++;
-        }
-        else {
-
-           /* dans le cas ou toutes les recherches sont indexees
-            il faut donc formater le resultat par les attributs du grouby
-            @TODO regarder si les recherches portent egalement sur le groupby = ne rien faire
-
-            */
-
-            if (!groupBy.isEmpty()) {
-                linesTMP = linesTMP.getLinesFormatted(tmp, groupBy);
-            }
-        }
-        //return linesTMP.toString();
-        /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
-        les 2 queries reoturnent le bon resultat mais ne se computent pas */
-        if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection).toString();
-        else return linesTMP.toString();
+    public String getIndex(@QueryParam("query") String query) {
+       return parser.parse(query);
     }
 
 
@@ -120,165 +68,6 @@ public class TestIndex {
         throw new RuntimeException("oups...");
     }
 
-    public static Map.Entry<String, Object[]> castToDateMap(Map.Entry<String, List<String>> entries) {
-        List<Date> tmp = new ArrayList<>();
-        for (String value : entries.getValue()) {
-            try {
-                tmp.add(sdf.parse(value));
-            }
-            catch (Exception e) {
-                return null;
-            }
-        }
-        return new AbstractMap.SimpleEntry<>(entries.getKey(), tmp.toArray());
-    }
-
-    /*public static Map.Entry<String, Object[]> castToIntegerMap(Map.Entry<String, List<String>> entries) {
-        List<Integer> tmp = new ArrayList<>();
-        for (String value : entries.getValue()) {
-            tmp.add(Integer.parseInt(value));
-        }
-        return new AbstractMap.SimpleEntry<>(entries.getKey(), tmp.toArray());
-    }*/
-
-    public static Map.Entry<String, Object[]> castToDoubleMap(Map.Entry<String, List<String>> entries) {
-        List<Double> tmp = new ArrayList<>();
-        for (String value : entries.getValue()) {
-            tmp.add(Double.parseDouble(value));
-        }
-        return new AbstractMap.SimpleEntry<>(entries.getKey(), tmp.toArray());
-    }
-
-
-    public static void parser(MultivaluedMap<String,String> queryParams) {
-        Object[] numbers;
-        List<String> attributes = CSVHelper.getNameIndexes();
-        MultivaluedMap<String, List<Object>> mapTMP = new MultivaluedHashMap<>();
-        Map.Entry<String, Object[]> entryTMP =  new AbstractMap.SimpleEntry<>(null, null);
-        for (Map.Entry<String, List<String>> queries : queryParams.entrySet()) {
-            if (queries.getKey().equals("SELECT")) selection = queries.getValue();
-            if (queries.getKey().equals("GROUPBY")) groupBy.addAll(queries.getValue());
-            else {
-                for (int i = 0; i < attributes.size(); i++) {
-                    if (queries.getKey().equals(attributes.get(i))) {
-                        switch (CSVHelper.getTypes().get(i).toString()) {
-                            case "date":
-                                entryTMP = castToDateMap(queries);
-                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                                break;
-                            case "double":
-                                //entryTMP = castToDoubleMap(queries);
-                                numbers = new Object[queries.getValue().size()];
-                                for (int j=0; j<queries.getValue().size(); j++) {
-                                    Optional<Integer> it = CastHelper.castToInteger(queries.getValue().get(j));
-                                    //Optional<Double> db = CastHelper.castToDouble(queries.getValue().get(j));
-                                    if (it.isPresent()) numbers[j] = it.get();
-                                    else numbers[j] = Double.parseDouble(queries.getValue().get(j));
-                                }
-                                entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), numbers);
-                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                                break;
-                            case "string":
-                                entryTMP = new AbstractMap.SimpleEntry<>(queries.getKey(), queries.getValue().toArray());
-                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                                break;
-                            default:
-                                //entryTMP = null;
-                                queriesTMP.put(entryTMP.getKey(), entryTMP.getValue());
-                        }
-                        if (index.getHashmap().containsKey(queries.getKey())) {
-                            indexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
-                        }
-                        else {
-                            notIndexTMP.put(queries.getKey(), queriesTMP.get(queries.getKey()));
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        queriesTMP.clear();
-    }
-
-
-    /*public static List<Integer> parserHashMap(String cmd, String value) {
-        Object[] attributes = index.getLines().getNameIndex();
-            for (int i = 0; i < attributes.length; i++) {
-                if (cmd.equals(attributes[i].toString())) {
-                    switch (index.getLines().getTypes()[i].toString()) {
-                        case "date":
-                            try {
-                                return (index.get(cmd, sdf.parse(value)));
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        case "double":
-                            Optional<Integer> it = CastHelper.castToInteger(value);
-                            if (it.isPresent()) return (index.get(cmd, it.get()));
-                            return (index.get(cmd, Double.parseDouble(value)));
-
-                        case "string":
-                            return (index.get(cmd, value));
-                        default:
-                            return new ArrayList<>();
-                    }
-                }
-        }
-        return null;*/
-
-
-       /* pourrait servir mais pas generique
-
-       switch (cmd) {
-            case "vendor_id":
-                return (index.get("vendor_id", value));
-            case "pickup_datetime":
-                try {
-                        return (index.get("pickup_datetime", sdf.parse(value)));
-                }
-                catch (Exception e) {
-                    return null;
-                }
-            case "dropoff_datetime":
-                try {
-                        return (index.get("dropoff_datetime", sdf.parse(value)));
-                }
-                catch (Exception e) {
-                    return null;
-                }
-            case "passenger_count":
-                return (index.get("passenger_count", Integer.parseInt(value)));
-            case "trip_distance":
-                return (index.get("trip_distance", Double.parseDouble(value)));
-            case "pickup_longitude":
-                return (index.get("pickup_longitude", Double.parseDouble(value)));
-            case "pickup_latitude":
-                return (index.get("pickup_latitude", Double.parseDouble(value)));
-            case "rate_code":
-                return (index.get("rate_code", Integer.parseInt(value)));
-            case "store_and_fwd_flag":
-                return (index.get("store_and_fwd_flag", value));
-            case "dropoff_longitude":
-                return (index.get("dropoff_longitude", Double.parseDouble(value)));
-            case "dropoff_latitude":
-                return (index.get("dropoff_latitude", Double.parseDouble(value)));
-            case "payment_type":
-                return (index.get("payment_type", value));
-            case "surcharge":
-                return (index.get("surcharge", Integer.parseInt(value)));
-            case "mta_tax":
-                return (index.get("mta_tax", Double.parseDouble(value)));
-            case "tip_amount":
-                return (index.get("tip_amount", Double.parseDouble(value)));
-            case "tolls_amount":
-                return (index.get("tolls_amount", Double.parseDouble(value)));
-            case "total_amount":
-                return (index.get("total_amount", Double.parseDouble(value)));
-        }
-        return null;
-        *
-
-    }*/
 
     /********************************************************		helpers		*/
 
@@ -288,7 +77,8 @@ public class TestIndex {
         CSVWriter writer = new CSVWriter(file);
         writer.writeCSVFile(1, 100000);
         CSVReader reader = new CSVReader(file);
-        index = new Index(file, reader.readForIndexing());
+        Index index = new Index(file, reader.readForIndexing());
+        parser = new Parser(index);
     }
 
     //et

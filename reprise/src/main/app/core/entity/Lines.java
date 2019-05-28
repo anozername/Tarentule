@@ -4,6 +4,7 @@ import main.app.core.search.CSVHelper;
 import main.app.core.search.CastHelper;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Lines extends ArrayList<Object[]> {
     private static final int posID = 0;
@@ -79,30 +80,40 @@ public class Lines extends ArrayList<Object[]> {
 
     /********************************************************		find		*/
 
-    public Lines getLines(List<Integer> ids) {
-        ArrayList<Object[]> res = new ArrayList<Object[]>();
-        Object[] line;
-        for (Integer it : ids) {
-            if ((line = rechercheDicho(it)) != null) {
-                res.add(line);
+    public Lines AND(Lines lines) {
+        int compare;
+        Lines res = new Lines();
+        for (Object[] ls1 : this) {
+            for (Object[] ls2 : lines) {
+                if ((compare = ((Integer)ls1[posID]).compareTo((Integer)ls2[posID])) == 0) {
+                    res.add(ls1);
+                }
+                if (compare < 0) break;
             }
         }
-        return new Lines(res);
+        return res;
     }
 
-    public Lines getLinesFormatted(List<Integer> ids, List<String> groupBy) {
+    public Lines OR(Lines lines) {
+        Lines res = new Lines();
+        res.addAll(this);
+        for (Object[] line : lines) {
+            if (!rechercheDicho((Integer)line[posID])) res.add(line);
+        }
+        return res;
+    }
+
+    public Lines getLinesFormatted(List<String> groupBy) {
         List<List<Object[]>> groupedRes = new ArrayList<>();
         ArrayList<Object[]> res;
         List<Integer> indicesGroup = new ArrayList<>();
         boolean added = false;
         int satisfaction = 0;
-        Object[] line;
         //if (groupBy.size() == 1 && groupBy.get(0).equals(()))
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
-        for (Integer it : ids) {
-            if ((line = rechercheDicho(it)) != null) {
+            for (Object[] line : this) {
                 for (List<Object[]> li : groupedRes) {
                     for (Integer i : indicesGroup) {
                         if (line[i].equals(li.get(0)[i])) {
@@ -122,7 +133,6 @@ public class Lines extends ArrayList<Object[]> {
                 }
                 added = false;
             }
-        }
         res = new ArrayList<>();
         for (List<Object[]> l : groupedRes) {
             res.addAll(l);
@@ -140,6 +150,7 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Lines getLinesWithSelect(List<String> selection) {
+        if (selection.size() == 1 && selection.get(0).equals("*")) return this;
         ArrayList<Object[]> res = new ArrayList<Object[]>();
         Object[] selectLine;
         int pos;
@@ -161,7 +172,7 @@ public class Lines extends ArrayList<Object[]> {
 
 
     //@IDEA peut etre rechercher a partir de sublines a chaque fois car ids donnés dans l'ordre
-    public Object[] rechercheDicho(Integer val) {
+    public boolean rechercheDicho(Integer val) {
 
         /* déclaration des variables locales à la fonction */
         boolean trouve;
@@ -187,8 +198,8 @@ public class Lines extends ArrayList<Object[]> {
         }
 
         /* test conditionnant la valeur que la fonction va renvoyer */
-        if (get(id)[posID] == val) return (get(id));
-        else return null;
+        if (((Integer)get(id)[posID]).equals(val)) return true;
+        else return false;
 
     }
 
@@ -216,15 +227,23 @@ public class Lines extends ArrayList<Object[]> {
         return sb.toString();
     }
 
-    public Lines computeResults(Lines l) {
+    public Lines computeResults(Lines l, int compute) {
         //if (l == null) return new ArrayList<>();
         Lines list = new Lines();
-        for (Object[] iq1 : this) {
-            for (Object[] iq2 : l) {
-                if (iq1[posID].equals(iq2[posID])) {
-                    list.add(iq2);
-                    break;
+        if (compute == 1) {
+            for (Object[] iq1 : this) {
+                for (Object[] iq2 : l) {
+                    if (iq1[posID].equals(iq2[posID])) {
+                        list.add(iq2);
+                        break;
+                    }
                 }
+            }
+        }
+        if (compute == 2) {
+            list.addAll(this);
+            for (Object[] line : l) {
+                if (!rechercheDicho((Integer)line[posID])) list.add(line);
             }
         }
         return list;
