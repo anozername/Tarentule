@@ -168,6 +168,9 @@ public class Parser {
                     queriesAND.put(query.getKey(), query.getValue());
                 }
             }
+            System.out.println(queriesAND);
+            System.out.println(queriesOR);
+            System.out.println(indexTMP);
             if (acc != 1) {
                 if (!queriesAND.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1, linesTMP).computeResults(linesTMP, 1);
                 if (!queriesOR.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
@@ -200,7 +203,10 @@ public class Parser {
     }
 
     public static void pushCommand(String cmd, Object value) {
-        if (index.getHashmap().containsKey(cmd)) {
+        String[] splitentry;
+        String command = cmd;
+        if ((splitentry = cmd.split("[ ]")).length == 2) command = splitentry[1];
+        if (index.getHashmap().containsKey(command)) {
             indexTMP.put(cmd, value);
         }
         else {

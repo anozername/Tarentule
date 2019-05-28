@@ -164,6 +164,7 @@ public class CSVFinder {
             }
             if (compute == 2) {
                 if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
+                    System.out.println(line[CSVHelper.getNameIndexes().indexOf(querie.getKey())]);
                     satisfaction++;
                 } else break;
             }

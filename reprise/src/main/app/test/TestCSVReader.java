@@ -24,7 +24,7 @@ public class TestCSVReader {
         CSVReader reader = new CSVReader(file);
         Index index = new Index(file, reader.readForIndexing());
         parser = new Parser(index);
-        String s = parser.parse("SELECT * WHERE (passenger_count = 3 AND VendorID = 1 OR trip_distance = 1.9) OR (VendorID = 1 AND trip_distance = 10.9) GROUPBY VendorID, total_amount");
+        String s = parser.parse("SELECT * WHERE (passenger_count = 1 AND VendorID = 1 AND total_amount = 60.89) AND (VendorID = 1 AND trip_distance = 10.9) GROUPBY VendorID, total_amount");
         System.out.println(s);
     }
 
