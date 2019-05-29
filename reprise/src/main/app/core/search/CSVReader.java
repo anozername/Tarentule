@@ -102,17 +102,19 @@ public class CSVReader {
         List<Object> tmp;
         int acc = 0;
         String cvsSplitBy = ",";
+        MultivaluedMap<Object, Integer> htmp;
         HashMap<String, MultivaluedMap<Object, Integer>> index = new HashMap<>();
         for (int indice = 0; indice < listIndex.size(); indice++) index.put(CSVHelper.getNameIndexes().get(listIndex.get(indice)), new MultivaluedHashMap<>());
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((line = br.readLine()) != null) {
                 trip =line.split(cvsSplitBy);
                 tmp = new ArrayList<>(CSVHelper.read(trip));
-                for (MultivaluedMap<Object, Integer> hmvalues : index.values()) {
-                    if (hmvalues.containsKey(tmp.get(listIndex.get(acc)))) {
-                        hmvalues.add(tmp.get(listIndex.get(acc)), (Integer)tmp.get(0));
+                for (int indice = 0; indice < listIndex.size(); indice++) {
+                    htmp = index.get(CSVHelper.getNameIndexes().get(listIndex.get(indice)));
+                    if (htmp.containsKey(tmp.get(listIndex.get(acc)))) {
+                        htmp.add(tmp.get(listIndex.get(acc)), (Integer)tmp.get(0));
                     } else {
-                        hmvalues.putSingle(tmp.get(listIndex.get(acc)), (Integer)tmp.get(0));
+                        htmp.putSingle(tmp.get(listIndex.get(acc)), (Integer)tmp.get(0));
                     }
                     acc++;
                 }

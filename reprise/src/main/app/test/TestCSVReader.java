@@ -20,11 +20,11 @@ public class TestCSVReader {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(1, 10000);
+        writer.writeCSVFile(1, 100);
         CSVReader reader = new CSVReader(file);
         Index index = new Index(file, reader.readForIndexing());
         parser = new Parser(index);
-        String s = parser.parse("SELECT * WHERE (passenger_count = 1 AND VendorID = 1 AND total_amount = 60.89) AND (VendorID = 1 AND trip_distance = 10.9) GROUPBY VendorID, total_amount");
+        String s = parser.parse("SELECT AVG(total_amount) WHERE (passenger_count = 1 AND VendorID = 1)");
         System.out.println(s);
     }
 

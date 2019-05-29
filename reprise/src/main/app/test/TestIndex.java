@@ -75,33 +75,11 @@ public class TestIndex {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(1, 100000);
+        writer.writeCSVFile(1, 100);
         CSVReader reader = new CSVReader(file);
         Index index = new Index(file, reader.readForIndexing());
         parser = new Parser(index);
     }
 
-    //et
-    public static List<Integer> computeResults(List<Integer> res_querie1, List<Integer> res_querie2)  {
-        if (res_querie1 == null) return new ArrayList<>();
-        List<Integer> tmp = new ArrayList<>();
-        for (int iq1 : res_querie1) {
-            for (int iq2 : res_querie2) {
-                if (iq1 == iq2) {
-                    tmp.add(iq1);
-                    break;
-                }
-            }
-        }
-        return tmp;
-    }
-
-    public static int getIndiceMax(List<Double> list) {
-        Double max = list.get(0);
-        for (Double d : list) {
-            if (max < d) max = d;
-        }
-        return list.indexOf(max);
-    }
 
 }

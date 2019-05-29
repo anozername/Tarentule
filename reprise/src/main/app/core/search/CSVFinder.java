@@ -157,16 +157,17 @@ public class CSVFinder {
         int satisfaction = 0;
         String[] splitentry;
         for (Map.Entry<String, Object> querie : queries.entrySet()) {
-            if (compute == 1) {
+            if (compute == 2) {
                 if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
                     return true;
                 }
             }
-            if (compute == 2) {
+            if (compute == 1) {
                 if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
-                    System.out.println(line[CSVHelper.getNameIndexes().indexOf(querie.getKey())]);
+
                     satisfaction++;
-                } else break;
+                }
+                else break;
             }
         }
         return satisfaction == queries.size();

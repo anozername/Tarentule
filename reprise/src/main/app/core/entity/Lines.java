@@ -3,6 +3,8 @@ package main.app.core.entity;
 import main.app.core.search.CSVHelper;
 import main.app.core.search.CastHelper;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,6 +99,7 @@ public class Lines extends ArrayList<Object[]> {
     public Lines OR(Lines lines) {
         Lines res = new Lines();
         res.addAll(this);
+        if (this.isEmpty()) return lines;
         for (Object[] line : lines) {
             if (!rechercheDicho((Integer)line[posID])) res.add(line);
         }
@@ -166,8 +169,68 @@ public class Lines extends ArrayList<Object[]> {
                 selectLine[x] = line[select.get(x)];
             }
             res.add(selectLine);
-            }
+        }
         return new Lines(res);
+    }
+
+    public Integer getCountWithSelect(String selection) {
+        return this.size();
+    }
+
+    public Double getSumWithSelect(String selection) {
+        Object[] selectLine = get(0);
+        Lines l = new Lines();
+        int pos;
+        Double res = 0.0;
+        if ((pos = CSVHelper.getNameIndexes().indexOf(selection)) != -1 && CSVHelper.getTypes().get(pos).equals("double")) {
+            for (Object[] line : this) {
+                if (line[pos] instanceof Integer) res += (double)((Integer)line[pos]).intValue();
+                else res += (Double)line[pos];
+            }
+        }
+        return res;
+    }
+
+    public Double getAvgWithSelect(String selection) {
+        return getSumWithSelect(selection) / getCountWithSelect(selection);
+    }
+
+    public Lines getMinWithSelect(String selection) {
+        Object[] selectLine = get(0);
+        Lines l = new Lines();
+        int pos;
+        double val1;
+        double val2;
+        if ((pos = CSVHelper.getNameIndexes().indexOf(selection)) != -1 && CSVHelper.getTypes().get(pos).equals("double")) {
+            for (Object[] line : this) {
+                if (selectLine[pos] instanceof Integer) val1 = (double)((Integer)selectLine[pos]).intValue();
+                else val1 = (Double)selectLine[pos];
+                if (line[pos] instanceof Integer) val2 = (double)((Integer)line[pos]).intValue();
+                else val2= (Double)line[pos];
+                if (val1 > val2) selectLine = line;
+            }
+        }
+        l.add(selectLine);
+        return l;
+    }
+
+    public Lines getMaxWithSelect(String selection) {
+        Object[] selectLine = get(0);
+        Lines l = new Lines();
+        int pos;
+        double val1;
+        double val2;
+        if ((pos = CSVHelper.getNameIndexes().indexOf(selection)) != -1 && CSVHelper.getTypes().get(pos).equals("double")) {
+            for (Object[] line : this) {
+                if (selectLine[pos] instanceof Integer) val1 = (double)((Integer)selectLine[pos]).intValue();
+                else val1 = (Double)selectLine[pos];
+                if (line[pos] instanceof Integer) val2 = (double)((Integer)line[pos]).intValue();
+                else val2= (Double)line[pos];
+                if (val1 < val2) selectLine = line;
+            }
+        }
+        l.add(selectLine);
+        return l;
     }
 
 
@@ -242,6 +305,7 @@ public class Lines extends ArrayList<Object[]> {
         }
         if (compute == 2) {
             list.addAll(this);
+            if (this.isEmpty()) return l;
             for (Object[] line : l) {
                 if (!rechercheDicho((Integer)line[posID])) list.add(line);
             }
