@@ -1,9 +1,9 @@
 package main.app;
 
-import main.app.test.TestEndpoint;
+import main.app.web.Endpoint;
 import main.app.core.filter.GsonProvider;
-import main.app.test.TestEngine;
-import main.app.test.TestIndex;
+import main.app.web.Engine;
+import main.app.web.Index;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -16,9 +16,9 @@ public class App extends Application {
     @Override
     public Set<Object> getSingletons() {
         Set<Object> sets = new HashSet<>(1);
-        sets.add(new TestEndpoint());
-        sets.add(new TestEngine());
-        sets.add(new TestIndex());
+        sets.add(new Endpoint());
+        sets.add(new Engine());
+        sets.add(new Index());
 
         return sets;
     }

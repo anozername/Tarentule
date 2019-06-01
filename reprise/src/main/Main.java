@@ -19,7 +19,7 @@ public class Main {
     public static List<String> externalNodes = new ArrayList<>();
     public static String file_path;
 
-    private static void jetty(int port) {
+    public static void jetty(int port) {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         context.setContextPath("/");
 
@@ -45,7 +45,7 @@ public class Main {
         }
     }
 
-    private static int option(String[] args){
+    public static int option(String[] args){
         // TODO File control
         // TODO make args[0] global
 
@@ -100,7 +100,7 @@ public class Main {
         return port;
     }
 
-    private static void addExternalNode(String command){
+    public static void addExternalNode(String command){
         String[] command_splitted = command.split(" ");
         if (command_splitted.length == 1){
             System.out.println("Missing argument : 'addExternalNode <address>'");

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 public class CSVWriter {
     private String name;
-    private static final String csvFile = "input.csv";
+    private static final String csvFile = Main.file_path;
 
     public CSVWriter(String name) {
         this.name = name;
