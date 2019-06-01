@@ -1,7 +1,5 @@
 package main.app.core.search;
 
-import main.app.core.entity.Lines;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -34,6 +32,9 @@ public class CSVFinder {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println("pimp 0");
+        //System.out.println(linesTMP);
         return linesTMP;
     }
 
@@ -53,6 +54,9 @@ public class CSVFinder {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("pimp 1.1");
+        System.out.println(res);
+        System.out.println("pimp 1.2");
         return res;
     }
 
@@ -65,6 +69,8 @@ public class CSVFinder {
                     res.add(line);
                 }
         }
+        System.out.println("pimp 2");
+        // System.out.println(res);
         return res;
     }
 
@@ -104,6 +110,8 @@ public class CSVFinder {
         for (List<Object[]> l : groupedRes) {
             res.addAll(l);
         }
+        System.out.println("pimp 3");
+        // System.out.println(res);
         return res;
     }
 
@@ -150,6 +158,8 @@ public class CSVFinder {
         for (List<Object[]> l : groupedRes) {
             res.addAll(l);
         }
+        System.out.println("pimp 4");
+        // System.out.println(res);
         return res;
     }
 
@@ -164,10 +174,11 @@ public class CSVFinder {
             }
             if (compute == 1) {
                 if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
-
                     satisfaction++;
                 }
-                else break;
+                else {
+                    break;
+                }
             }
         }
         return satisfaction == queries.size();

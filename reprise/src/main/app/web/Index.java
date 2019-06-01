@@ -54,6 +54,7 @@ public class Index {
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
     public String getIndex(@QueryParam("query") String query) {
+        insertion_test(); //flemme 101
         return parser.parse(query);
     }
 
@@ -71,7 +72,7 @@ public class Index {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(1, 100);
+        writer.writeCSVFile(1, 100000);
         CSVReader reader = new CSVReader(file);
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
         parser = new Parser(index);

@@ -79,7 +79,9 @@ public class Parser {
         Lines resultsLines = new Lines();
         List<String[]> cmds = new ArrayList<>();
         String[] queries = command.split("[\\(||\\)]");
-        for (String query : queries) cmds.add(query.split("[ ]"));
+        for (String query : queries) {
+            cmds.add(query.split("[ ]"));
+        }
         String cmdTMP;
         int acc = 1;
         int accCMDS = 0;
@@ -108,12 +110,16 @@ public class Parser {
                 accCMDS++;
                 acc = -1;
             }
+
             while (accCMDS < cmds.size()) {
                 do {
                     acc++;
-
-                    if (acc > 0) cmdTMP = cmds.get(accCMDS)[acc-1] + " " + cmds.get(accCMDS)[acc];
-                    else cmdTMP = cmds.get(accCMDS)[acc];
+                    if (acc > 0) {
+                        cmdTMP = cmds.get(accCMDS)[acc-1] + " " + cmds.get(accCMDS)[acc];
+                    }
+                    else {
+                        cmdTMP = cmds.get(accCMDS)[acc];
+                    }
                     if ((ind = CSVHelper.getNameIndexes().indexOf(cmds.get(accCMDS)[acc])) != -1) {
                         acc++;
 
@@ -141,6 +147,7 @@ public class Parser {
                         }
                     }
                 } while (acc < cmds.get(accCMDS).length && (cmds.get(accCMDS)[acc].equals("AND") || cmds.get(accCMDS)[acc].equals("OR")));
+
                 accCMDS++;
                 if (and) {
                     resultsLines = resultsLines.AND(getResults());
@@ -151,23 +158,33 @@ public class Parser {
                     or = false;
                 }
                 //ou = 0 et taille = 1 mais pas tout de suite OK
-                if (accCMDS == 2 || (accCMDS == 4 && typeSelection != 0)) resultsLines = getResults();
+                if (accCMDS == 2 || (accCMDS == 4 && typeSelection != 0)) {
+                    resultsLines = getResults();
+                }
                 if (accCMDS < cmds.size()) {
-                    if (cmds.get((accCMDS))[1].equals(("AND")))
+                    if (cmds.get((accCMDS))[1].equals(("AND"))) {
                         and = true;
+                    }
                     else {
-                        if (cmds.get((accCMDS))[1].equals(("OR")))
+                        if (cmds.get((accCMDS))[1].equals(("OR"))){
                             or = true;
+                        }
                     }
                     acc = -1;
                     indexTMP.clear();
                     notIndexTMP.clear();
-                    if ((cmds.get((accCMDS))[1].equals(("GROUPBY")))) break;
+                    if ((cmds.get((accCMDS))[1].equals(("GROUPBY")))) {
+                        break;
+                    }
                     accCMDS++;
                 }
-                else break;
+                else{
+                    break;
+                }
             }
         }
+
+
         return getLinesSelect(resultsLines, typeSelection);
     }
 
@@ -178,6 +195,7 @@ public class Parser {
         String[] splitentry;
         String key;
         int compute = 0;
+
         for (Map.Entry<String, Object> query : indexTMP.entrySet()) {
             if ((splitentry = query.getKey().split("[ ]")).length == 2) {
                 key = splitentry[1];
@@ -190,7 +208,10 @@ public class Parser {
                         break;
                 }
             }
-            else key = query.getKey();
+            else {
+                key = query.getKey();
+            }
+
             if (acc != 1) {
                 tmp = tmp.computeResults(index.getValueWithIndex(key, query.getValue()), compute);
             }
@@ -220,12 +241,20 @@ public class Parser {
                 }
             }
             if (acc != 1) {
-                if (!queriesAND.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1, linesTMP).computeResults(linesTMP, 1);
-                if (!queriesOR.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
+                if (!queriesAND.isEmpty()) {
+                    linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1, linesTMP).computeResults(linesTMP, 1);
+                }
+                if (!queriesOR.isEmpty()) {
+                    linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
+                }
             }
             else {
-                if (!queriesAND.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1);
-                if (!queriesOR.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
+                if (!queriesAND.isEmpty()){
+                    linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1);
+                }
+                if (!queriesOR.isEmpty()){
+                    linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
+                }
             }
             acc++;
         }
@@ -241,7 +270,6 @@ public class Parser {
                 linesTMP = linesTMP.getLinesFormatted(groupBy);
             }
         }
-
         //return linesTMP.toString();
         /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
         les 2 queries reoturnent le bon resultat mais ne se computent pas */

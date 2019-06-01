@@ -11,6 +11,7 @@ import java.util.*;
 public class CSVReader {
 
     private String csvFile;
+    private int line_max = 9000000;
 
     private static HashMap<Object, Integer>[] indexes;
 
@@ -30,23 +31,27 @@ public class CSVReader {
         String line = "";
         String cvsSplitBy = ",";
         List<Object> tmp;
+        int line_nb = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             indexes = Arrays.copyOf(CSVHelper.getIndexes(), CSVHelper.getIndexes().length);
             while ((line = br.readLine()) != null) {
-                tmp = new ArrayList<>(CSVHelper.read(line.split(cvsSplitBy)));
-                for (int pos = 1; pos < indexes.length; pos++) {
-                    if (indexes[pos] != null) {
-                        if (!indexes[pos].containsKey(tmp.get(pos))) {
-                            indexes[pos].put(tmp.get(pos), 1);
-                        } else {
-                            valueTMP = indexes[pos].get(tmp.get(pos)) + 1;
-                            indexes[pos].put(tmp.get(pos), valueTMP);
-                        }
+                if (line_nb < line_max){
+                    tmp = new ArrayList<>(CSVHelper.read(line.split(cvsSplitBy)));
+                    for (int pos = 1; pos < indexes.length; pos++) {
+                        if (indexes[pos] != null) {
+                            if (!indexes[pos].containsKey(tmp.get(pos))) {
+                                indexes[pos].put(tmp.get(pos), 1);
+                            } else {
+                                valueTMP = indexes[pos].get(tmp.get(pos)) + 1;
+                                indexes[pos].put(tmp.get(pos), valueTMP);
+                            }
 
+                        }
                     }
+                    tmp.clear();
+                    deleteFatMap();
                 }
-                tmp.clear();
-                deleteFatMap();
+                line_nb++;
             }
             ArrayList<Integer> scores = new ArrayList<>(getScoresForIndexing());
             scores.add(0, null);
@@ -104,21 +109,27 @@ public class CSVReader {
         String cvsSplitBy = ",";
         MultivaluedMap<Object, Integer> htmp;
         HashMap<String, MultivaluedMap<Object, Integer>> index = new HashMap<>();
-        for (int indice = 0; indice < listIndex.size(); indice++) index.put(CSVHelper.getNameIndexes().get(listIndex.get(indice)), new MultivaluedHashMap<>());
+        for (Integer indice : listIndex) {
+            index.put(CSVHelper.getNameIndexes().get(indice), new MultivaluedHashMap<>());
+        }
+        int line_nb = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((line = br.readLine()) != null) {
-                trip =line.split(cvsSplitBy);
-                tmp = new ArrayList<>(CSVHelper.read(trip));
-                for (int indice = 0; indice < listIndex.size(); indice++) {
-                    htmp = index.get(CSVHelper.getNameIndexes().get(listIndex.get(indice)));
-                    if (htmp.containsKey(tmp.get(listIndex.get(acc)))) {
-                        htmp.add(tmp.get(listIndex.get(acc)), (Integer)tmp.get(0));
-                    } else {
-                        htmp.putSingle(tmp.get(listIndex.get(acc)), (Integer)tmp.get(0));
+                if (line_nb < line_max) {
+                    trip = line.split(cvsSplitBy);
+                    tmp = new ArrayList<>(CSVHelper.read(trip));
+                    for (Integer indice : listIndex) {
+                        htmp = index.get(CSVHelper.getNameIndexes().get(indice));
+                        if (htmp.containsKey(tmp.get(listIndex.get(acc)))) {
+                            htmp.add(tmp.get(listIndex.get(acc)), (Integer) tmp.get(0));
+                        } else {
+                            htmp.putSingle(tmp.get(listIndex.get(acc)), (Integer) tmp.get(0));
+                        }
+                        acc++;
                     }
-                    acc++;
+                    acc = 0;
                 }
-                acc = 0;
+                line_nb++;
             }
         } catch (IOException e) {
             e.printStackTrace();
