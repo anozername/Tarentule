@@ -5,11 +5,11 @@ import javax.ws.rs.core.*;
 import java.util.*;
 import java.io.File;
 
+import com.mashape.unirest.http.Unirest;
 import main.Main;
 import main.app.core.search.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import main.app.engine.LoadBalancer;
+import org.json.JSONObject;
 
 @Path("/test/index")
 @Produces(MediaType.APPLICATION_JSON)
@@ -19,43 +19,33 @@ public class Index {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String helloWorld() throws Exception{
-        File input = new File(Main.file_path);
-        File output = new File("output.json");
+    public String helloWorld(@QueryParam("query") String query) throws Exception{
+        LoadBalancer loadBalancer = new LoadBalancer();
+        //String result = loadBalancer.distribute(query);
+        System.out.println(query);
+        String result = loadBalancer.distribute(query);
 
-        CsvSchema csvSchema = CsvSchema.builder().setUseHeader(true).build();
-        CsvMapper csvMapper = new CsvMapper();
-
-       // ObjectMapper mapper2 = new ObjectMapper();
-        // Read data from CSV file
-        List<Object> readAll = csvMapper.readerFor(Map.class).with(csvSchema).readValues(input).readAll();
-        ObjectMapper mapper = new ObjectMapper();
-
-        // Write JSON formated data to output.json file
-        mapper.writerWithDefaultPrettyPrinter().writeValue(output, readAll);
-
-        // Write JSON formated data to stdout
-        //System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll));
-
-        //List<Map<String, Object>> readlines = mapper2.readValue(output, new TypeReference<List<Map<String, Object>>>(){} );
-
-        return readAll.toString();
+        return "result '"+result+"'";
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/insert")
     public String insert() {
-        insertion_test();
-        return "insert ok";
+        //insertion_test();
+        return "insert pas ok";
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("/find")
-    public String getIndex(@QueryParam("query") String query) {
-        insertion_test(); //flemme 101
+    public Response getIndex(@QueryParam("query") String query, @QueryParam("beginning") int beginning, @QueryParam("ending") int ending) {
+        System.out.println(beginning+" "+ending);
+        return Response.status(Response.Status.OK).entity(new ResponseIndex("ok")).build();
+        /*
+        insertion_test(beginning, ending);
         return parser.parse(query);
+        */
     }
 
 
@@ -68,15 +58,21 @@ public class Index {
 
     /********************************************************		helpers		*/
 
-    public void insertion_test() {
+    public void insertion_test(int beginning, int ending) {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(1, 100000);
+        writer.writeCSVFile(beginning, ending);
         CSVReader reader = new CSVReader(file);
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
         parser = new Parser(index);
     }
 
+    public class ResponseIndex {
+        String response;
 
+        ResponseIndex(String response) {
+            this.response = response;
+        }
+    }
 }

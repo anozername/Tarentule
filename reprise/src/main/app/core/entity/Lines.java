@@ -1,12 +1,7 @@
 package main.app.core.entity;
 
 import main.app.core.search.CSVHelper;
-import main.app.core.search.CastHelper;
-
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Lines extends ArrayList<Object[]> {
     private static final int posID = 0;
@@ -71,7 +66,6 @@ public class Lines extends ArrayList<Object[]> {
         }
         return -1;
     }
-
 
     /********************************************************		insert		*/
 
@@ -153,14 +147,17 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Lines getLinesWithSelect(List<String> selection) {
-        if (selection.size() == 1 && selection.get(0).equals("*")) return this;
+        if (selection.size() == 1 && selection.get(0).equals("*")) {
+            return this;
+        }
         ArrayList<Object[]> res = new ArrayList<Object[]>();
         Object[] selectLine;
         int pos;
         List<Integer> select = new ArrayList<>();
         for (String attribute : selection) {
-            if ((pos = CSVHelper.getNameIndexes().indexOf(attribute)) != -1 ) select.add(pos);
-
+            if ((pos = CSVHelper.getNameIndexes().indexOf(attribute)) != -1 ){
+                select.add(pos);
+            }
         }
 
         for (Object[] line : this) {
@@ -174,6 +171,13 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Integer getCountWithSelect(String selection) {
+        int nb_lines = 0;
+        for (int i = 0; i < this.size(); i++){
+            if (i >= 50000) {
+                nb_lines++;
+            }
+        }
+
         return this.size();
     }
 
@@ -184,14 +188,19 @@ public class Lines extends ArrayList<Object[]> {
         Double res = 0.0;
         if ((pos = CSVHelper.getNameIndexes().indexOf(selection)) != -1 && CSVHelper.getTypes().get(pos).equals("double")) {
             for (Object[] line : this) {
-                if (line[pos] instanceof Integer) res += (double)((Integer)line[pos]).intValue();
-                else res += (Double)line[pos];
+                if (line[pos] instanceof Integer) {
+                    res += (double)((Integer)line[pos]).intValue();
+                }
+                else {
+                    res += (Double)line[pos];
+                }
             }
         }
         return res;
     }
 
     public Double getAvgWithSelect(String selection) {
+        System.out.println(getSumWithSelect(selection) + " " + getCountWithSelect(selection));
         return getSumWithSelect(selection) / getCountWithSelect(selection);
     }
 

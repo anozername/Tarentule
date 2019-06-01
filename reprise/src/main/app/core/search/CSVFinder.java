@@ -43,20 +43,24 @@ public class CSVFinder {
         boolean satisfaction;
         String lineSTR;
         List<Object> line;
+        int line_nb = 50000;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((lineSTR = br.readLine()) != null) {
-                line = CSVHelper.read(lineSTR.split(cvsSplitBy));
-                satisfaction = getSatisfaction(queries, line.toArray(), compute);
-                if (satisfaction) {
-                    res.add(line.toArray());
+                if (line_nb >= 50000) {
+                    line = CSVHelper.read(lineSTR.split(cvsSplitBy));
+                    satisfaction = getSatisfaction(queries, line.toArray(), compute);
+                    if (satisfaction) {
+                        res.add(line.toArray());
+                    }
                 }
+                line_nb++;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("pimp 1.1");
-        System.out.println(res);
-        System.out.println("pimp 1.2");
+
+        System.out.println("pimp 1");
+        //System.out.println(res);"
         return res;
     }
 

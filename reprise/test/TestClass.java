@@ -1,7 +1,6 @@
 import com.mashape.unirest.http.Unirest;
 import main.Main;
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 import javax.ws.rs.Consumes;
@@ -59,7 +58,7 @@ public class TestClass {
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
             String strTemp = "";
             while (null != (strTemp = br.readLine())) {
-                Assert.assertEquals("insert ok", strTemp+"");
+                Assert.assertEquals("insert pas ok", strTemp+"");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -73,7 +72,7 @@ public class TestClass {
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
             String strTemp = "";
             while (null != (strTemp = br.readLine())) {
-                Assert.assertEquals("insert ok", strTemp+"");
+                Assert.assertEquals("insert pas ok", strTemp+"");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -84,7 +83,7 @@ public class TestClass {
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
             String strTemp = "";
             while (null != (strTemp = br.readLine())) {
-                Assert.assertEquals("avg :17.064588235294114", strTemp+"");
+                Assert.assertEquals("{\"response\":\"ok\"}", strTemp+"");
             }
         } catch (Exception ex) {
             ex.printStackTrace();

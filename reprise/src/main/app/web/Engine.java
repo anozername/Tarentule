@@ -19,7 +19,7 @@ public class Engine {
         LoadBalancer loadBalancer = new LoadBalancer();
 
         Long start = System.currentTimeMillis();
-        long result = loadBalancer.distribute();
+        long result = 0L;//loadBalancer.distribute();
         Long end = System.currentTimeMillis();
 
         return Response.status(Response.Status.OK).entity(new ResponseEngine(end - start, result)).build();
