@@ -2,11 +2,6 @@ package main.app.core.search;
 
 import main.app.core.entity.Index;
 import main.app.core.entity.Lines;
-
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,11 +22,12 @@ public class Parser {
         for (String[] cmd : cmds) {
             for (int i = 0; i < cmd.length ; i++) {
                 if (cmd[i].equals("GROUPBY")) {
-                    for (int j = i+1; j < cmd.length ; j++) groupBy.add(cmd[j].replace(",", ""));
+                    for (int j = i+1; j < cmd.length ; j++) {
+                        groupBy.add(cmd[j].replace(",", ""));
+                    }
                 }
             }
         }
-
     }
 
     public int selectType(String cmd) {
@@ -70,6 +66,7 @@ public class Parser {
     }
 
     public String parse(String command) {
+        System.out.println("parse");
         indexTMP.clear();
         notIndexTMP.clear();
         selection.clear();
@@ -157,10 +154,12 @@ public class Parser {
                     resultsLines = resultsLines.OR(getResults());
                     or = false;
                 }
+
                 //ou = 0 et taille = 1 mais pas tout de suite OK
                 if (accCMDS == 2 || (accCMDS == 4 && typeSelection != 0)) {
                     resultsLines = getResults();
                 }
+
                 if (accCMDS < cmds.size()) {
                     if (cmds.get((accCMDS))[1].equals(("AND"))) {
                         and = true;
@@ -183,7 +182,6 @@ public class Parser {
                 }
             }
         }
-
 
         return getLinesSelect(resultsLines, typeSelection);
     }
@@ -274,6 +272,7 @@ public class Parser {
         /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
         les 2 queries reoturnent le bon resultat mais ne se computent pas */
         //if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection);
+
         return linesTMP;
     }
 

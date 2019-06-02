@@ -11,11 +11,11 @@ public class Reader {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(1, 100);
+        writer.writeCSVFile(1, 10000);
         main.app.core.search.CSVReader reader = new main.app.core.search.CSVReader(file);
         Index index = new Index(file, reader.readForIndexing());
         parser = new Parser(index);
-        String s = parser.parse("SELECT AVG(total_amount) WHERE (passenger_count = 1 AND VendorID = 1)");
+        String s = parser.parse("SELECT AVG(passenger_count) WHERE (store_and_fwd_flag = M)");
         System.out.println(s);
     }
 

@@ -2,14 +2,8 @@ package main.app.web;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.util.*;
-import java.io.File;
-
-import com.mashape.unirest.http.Unirest;
-import main.Main;
 import main.app.core.search.*;
 import main.app.engine.LoadBalancer;
-import org.json.JSONObject;
 
 @Path("/test/index")
 @Produces(MediaType.APPLICATION_JSON)
@@ -21,8 +15,7 @@ public class Index {
     @Produces(MediaType.TEXT_HTML)
     public String helloWorld(@QueryParam("query") String query) throws Exception{
         LoadBalancer loadBalancer = new LoadBalancer();
-        //String result = loadBalancer.distribute(query);
-        System.out.println(query);
+        System.out.println("query :'"+query+"'");
         String result = loadBalancer.distribute(query);
 
         return "result '"+result+"'";
@@ -36,14 +29,14 @@ public class Index {
         return "insert pas ok";
     }
 
-    @GET
-    @Produces(MediaType.TEXT_HTML)
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/find")
-    public Response getIndex(@QueryParam("query") String query, @QueryParam("beginning") int beginning, @QueryParam("ending") int ending) {
+    public Response getIndex(@FormParam("beginning") int beginning, @FormParam("query") String query, @FormParam("ending") int ending) {
         System.out.println(beginning+" "+ending);
-        return Response.status(Response.Status.OK).entity(new ResponseIndex("ok")).build();
-        /*
         insertion_test(beginning, ending);
+        return Response.status(Response.Status.OK).entity(new ResponseIndex(parser.parse(query))).build();
+        /*
         return parser.parse(query);
         */
     }
@@ -55,14 +48,13 @@ public class Index {
         throw new RuntimeException("oups...");
     }
 
-
     /********************************************************		helpers		*/
 
     public void insertion_test(int beginning, int ending) {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(beginning, ending);
+        writer.writeCSVFile(beginning, ending-1); //TODO rm "-1'
         CSVReader reader = new CSVReader(file);
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
         parser = new Parser(index);

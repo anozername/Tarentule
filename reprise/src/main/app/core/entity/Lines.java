@@ -182,7 +182,6 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Double getSumWithSelect(String selection) {
-        Object[] selectLine = get(0);
         Lines l = new Lines();
         int pos;
         Double res = 0.0;

@@ -17,18 +17,16 @@ import java.util.concurrent.Future;
 
 public class LoadBalancer {
     private int fake_nb_lines = 0;
-    {
-        try {
-            fake_nb_lines = countLines(Main.file_path);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private Map<String, JSONObject> neighborhood = new HashMap<>();
 
     public LoadBalancer(){
         System.out.println("Balancing...");
+        try {
+            fake_nb_lines = countLines(Main.file_path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         for (String externalAddresses : Main.externalNodes){
             try {
                 neighborhood.put(externalAddresses , new JSONObject(Unirest.get("http://"+externalAddresses+"/test/network").asJson().getBody().getObject().toString()));
@@ -65,11 +63,15 @@ public class LoadBalancer {
             max += entry.getValue().getLong("processor");
         }
         System.out.println("total proco : "+max);
-        int[] scope = new int[]{1, 1};
-        for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
+        int[] scope = new int[]{0, 0    };
+        for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) { // http://localhost:8080/test/index/?query=SELECT AVG(passenger_count) WHERE (store_and_fwd_flag = M)
             scope = balance(scope[1], max, entry.getValue().getInt("processor"));
-            //Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/engine/work").header("accept", "application/json").field("beginning", scope[0]).field("file", "file.csv").field("ending", scope[1]).asJsonAsync();
-            Future<HttpResponse<JsonNode>> future = Unirest.get("http://localhost:8080/test/index/find?query="+query+"&beginning="+scope[0]+"&ending="+scope[1]).asJsonAsync();
+            String addresse = entry.getKey()+"/test/index/find?query="+query+"&beginning="+scope[0]+"&ending="+scope[1];// 'x = M' ok // "x=M' not
+            System.out.println(addresse);
+         //Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/engine/work").header("accept", "application/json").field("beginning", scope[0]).field("file", "file.csv").field("ending", scope[1]).asJsonAsync();
+            Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/index/find").header("accept", "application/json").field("beginning", scope[0]).field("query", query).field("ending", scope[1]).asJsonAsync();
+            System.out.println("qsdf");
+
             futures.add(future);
         }
 
@@ -112,7 +114,6 @@ public class LoadBalancer {
 
             // count remaining characters
             while (readChars != -1) {
-                System.out.println(readChars);
                 for (int i=0; i<readChars; ++i) {
                     if (c[i] == '\n') {
                         ++count;
