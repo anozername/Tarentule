@@ -66,7 +66,6 @@ public class Parser {
     }
 
     public String parse(String command) {
-        System.out.println("parse");
         indexTMP.clear();
         notIndexTMP.clear();
         selection.clear();

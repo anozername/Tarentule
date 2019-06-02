@@ -1,11 +1,13 @@
 import com.mashape.unirest.http.Unirest;
 import main.Main;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.After;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,9 +16,10 @@ import java.util.ArrayList;
 public class TestClass {
     @Before
     public void before() throws Exception {
-        String[] args = {"-F", "../tiny.csv"};
-
+        String[] args = {"-F", "../tinyload.csv"};
         Main.jetty(Main.option(args));
+
+        //Thread main = new Thread(new Main());
     }
 
     @After
@@ -27,66 +30,66 @@ public class TestClass {
     @org.junit.Test
     public void testEndPoint() throws Exception {
         for (String externalAddresses : Main.externalNodes) {
-            Assert.assertEquals("ok",
-                    "{\"app\":\"RESTFUL API - java index\",\"response\":true,\"id\":\"intellij\"}",
-                    Unirest.get("http://" + externalAddresses + "/test/api/json").asJson().getBody().getObject().toString()+""
+            Assert.assertEquals(  "{\"app\":\"RESTFUL API - java index\",\"response\":true,\"id\":\"intellij\"}",
+                                    Unirest.get("http://" + externalAddresses + "/test/api/json").asJson().getBody().getObject().toString()+""
             );
         }
     }
 
+    /*
     @org.junit.Test
-    public void testMultipleBenchmark() throws Exception {
-        String[] args = {"-F", "../tiny.csv", "-P","8081"};
-        Main.jetty(Main.option(args));
+    public void testExternalNode() throws Exception {
+        String[] args = {"-F", "../tinyload.csv", "-P","8081"};
+        //TODO Main.jetty(Main.option(args)); //IMPOSSIBRU
 
-        // Main.addExternalNode("addExternalNode localhost:8081"); //same Main.externalNodes so useless
-        for (String externalAddresses : Main.externalNodes) {
-            System.out.println(externalAddresses);
-            Assert.assertEquals(
-                    "{\"app\":\"RESTFUL API - java index\",\"response\":true,\"id\":\"intellij\"}",
-                    Unirest.get("http://" + externalAddresses + "/test/api/json").asJson().getBody().getObject().toString()+""
-            );
-        }
-
-        Assert.assertEquals(2,Main.externalNodes.size());
-    }
-
-    @org.junit.Test
-    public void testInsertion() {
-        try {
-            URL url = new URL("http://localhost:8080/test/index/insert");
-            BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-            String strTemp = "";
-            while (null != (strTemp = br.readLine())) {
-                Assert.assertEquals("insert pas ok", strTemp+"");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        // Main.addExternalNode("addExternalNode localhost:8081"); //same Main.externalNodes therefor useless
+        URL url = new URL("http://localhost:8080/test/network/list");
+        BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+        String strTemp = "";
+        while (null != (strTemp = br.readLine())) {
+            Assert.assertEquals("[localhost:8080, localhost:8081]", strTemp+"");
         }
     }
+    */
 
     @org.junit.Test
-    public void testQuery() {
-        try {
-            URL url = new URL("http://localhost:8080/test/index/insert");
-            BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-            String strTemp = "";
-            while (null != (strTemp = br.readLine())) {
-                Assert.assertEquals("insert pas ok", strTemp+"");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        try {
-            URL url = new URL("http://localhost:8080/test/index/find?query=SELECT%20AVG(total_amount)%20WHERE%20(passenger_count%20=%201%20AND%20VendorID%20=%201)");
-            BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-            String strTemp = "";
-            while (null != (strTemp = br.readLine())) {
-                Assert.assertEquals("{\"response\":\"ok\"}", strTemp+"");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+    public void testQuery() throws Exception{
+        JSONObject jsonObject = (JSONObject) new JSONObject(Unirest.get("http://localhost:8080/test/index/json/?query=SELECT%20AVG(passenger_count)%20WHERE%20(store_and_fwd_flag%20=%20M)").asJson().getBody().getObject().toString()).get("localhost:8080");
+        Assert.assertEquals(  "{\"nb 0\":\"avg :1.0\"}", jsonObject.get("response").toString());
     }
+
+    /*
+    @org.junit.Test
+    public void testMultipleQuery() throws Exception{
+        String[] args = {"-F", "../tinyload.csv", "-P","8081"};
+        //TODO Main.jetty(Main.option(args)); //IMPOSSIBRU
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    //start a new jvm with 256m of memory with the MyClass passing 2 parameters
+                    String cmd = "java Main.java -F ../tinyload.csv -P 8081";
+                    Process p = Runtime.getRuntime().exec(cmd);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                    String line = br.readLine();
+                    while (line != null) {
+                        line = br.readLine();
+                    }
+                    br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                    line = br.readLine();
+                    while (line != null) {
+                        line = br.readLine();
+                    }
+                    System.out.println("ok");
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+        }).start();
+
+        Main.addExternalNode("addExternalNode localhost:8081");
+        JSONObject jsonObject = (JSONObject) new JSONObject(Unirest.get("http://localhost:8080/test/index/json/?query=SELECT%20AVG(passenger_count)%20WHERE%20(store_and_fwd_flag%20=%20M)").asJson().getBody().getObject().toString()).get("localhost:8080");
+
+        Assert.assertEquals(  "{\"nb 0\":\"avg :3.0\"}", jsonObject.get("response").toString());
+    }
+    */
 }

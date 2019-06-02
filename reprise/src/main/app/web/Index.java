@@ -45,7 +45,6 @@ public class Index {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/find")
     public String getIndex(@FormParam("beginning") int beginning, @FormParam("query") String query, @FormParam("ending") int ending) {
-        System.out.println(beginning+" "+ending);
         insertion_test(beginning, ending);
         String result = parser.parse(query);
         JSONObject lines = new JSONObject();

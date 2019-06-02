@@ -40,7 +40,6 @@ public class LoadBalancer {
     private int[] balance(int last, int max, int processors){
         int beginning = last+1; //skip line 0 (header) / 1 (usually blank)
 
-        System.out.println(processors);
         int ending = beginning + processors*(fake_nb_lines/max);
         //TODO check first & last lines
 
@@ -91,6 +90,7 @@ public class LoadBalancer {
 
         return json.toString();
     }
+
     public static int countLines(String filename) throws IOException {
         InputStream is = new BufferedInputStream(new FileInputStream(filename));
         try {

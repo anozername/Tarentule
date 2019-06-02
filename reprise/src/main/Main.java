@@ -120,11 +120,6 @@ public class Main {
         }
     }
 
-    private static void stop(){
-        System.out.println("Bye.");
-        System.exit(0);
-    }
-
     public static void main(String[] args) {
         // <-- Jetty embedded --> // <-- Option setup -->
         jetty(option(args));
@@ -138,7 +133,8 @@ public class Main {
             System.out.println("The command is: " + command);  // Output user input
             switch (command.split(" ")[0]) {
                 case "stop":
-                    stop();
+                    System.out.println("Bye.");
+                    System.exit(0);
                     break;
                 case "addExternalNode":
                     addExternalNode(command);
@@ -150,5 +146,4 @@ public class Main {
         }
 
     }
-
 }
