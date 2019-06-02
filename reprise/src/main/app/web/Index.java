@@ -4,6 +4,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import main.app.core.search.*;
 import main.app.engine.LoadBalancer;
+import org.json.JSONObject;
 
 @Path("/test/index")
 @Produces(MediaType.APPLICATION_JSON)
@@ -13,12 +14,23 @@ public class Index {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String helloWorld(@QueryParam("query") String query) throws Exception{
+    public String string(@QueryParam("query") String query) throws Exception{
         LoadBalancer loadBalancer = new LoadBalancer();
         System.out.println("query :'"+query+"'");
         String result = loadBalancer.distribute(query);
 
-        return "result '"+result+"'";
+        return result;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/json")
+    public Response json(@QueryParam("query") String query) throws Exception{
+        LoadBalancer loadBalancer = new LoadBalancer();
+        System.out.println("query :'"+query+"'");
+        String result = loadBalancer.distribute(query);
+
+        return Response.status(Response.Status.OK).entity(result).build();
     }
 
     @GET
@@ -32,13 +44,18 @@ public class Index {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/find")
-    public Response getIndex(@FormParam("beginning") int beginning, @FormParam("query") String query, @FormParam("ending") int ending) {
+    public String getIndex(@FormParam("beginning") int beginning, @FormParam("query") String query, @FormParam("ending") int ending) {
         System.out.println(beginning+" "+ending);
         insertion_test(beginning, ending);
-        return Response.status(Response.Status.OK).entity(new ResponseIndex(parser.parse(query))).build();
-        /*
-        return parser.parse(query);
-        */
+        String result = parser.parse(query);
+        JSONObject lines = new JSONObject();
+        int nb = 0;
+        for (String line:result.split("\n")) {
+            lines.put("nb "+nb, line);
+            nb++;
+        }
+        //return result;
+        return lines.toString();
     }
 
 
@@ -60,11 +77,15 @@ public class Index {
         parser = new Parser(index);
     }
 
-    public class ResponseIndex {
-        String response;
+    public class ResponseQuery {
+        public JSONObject lines = new JSONObject();
 
-        ResponseIndex(String response) {
-            this.response = response;
+        ResponseQuery(String response) {
+            int nb = 0;
+            for (String line:response.split("\n")) {
+                this.lines.put("nb "+nb, line);
+                nb++;
+            }
         }
     }
 }

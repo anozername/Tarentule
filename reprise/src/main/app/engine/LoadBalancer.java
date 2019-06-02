@@ -53,7 +53,7 @@ public class LoadBalancer {
     public String distribute(String query){
         //TODO parallelize ?
         String compute = "";
-        List<Future<HttpResponse<JsonNode>>> futures = new ArrayList<>();
+        JSONObject json = new JSONObject();
 
         //TODO adapt to the query parsed
         //     String result = new JSONObject(Unirest.get("http://localhost:8080/test/index/find?query="+query+"&beginning="+beginning+"&ending="+ending).asJson().getBody().getObject().toString()).getString("response");
@@ -62,33 +62,34 @@ public class LoadBalancer {
         for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) { //TODO opti
             max += entry.getValue().getLong("processor");
         }
-        System.out.println("total proco : "+max);
-        int[] scope = new int[]{0, 0    };
+        //System.out.println("total proco : "+max);
+        int[] scope = new int[]{0, 0};
         for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) { // http://localhost:8080/test/index/?query=SELECT AVG(passenger_count) WHERE (store_and_fwd_flag = M)
             scope = balance(scope[1], max, entry.getValue().getInt("processor"));
-            String addresse = entry.getKey()+"/test/index/find?query="+query+"&beginning="+scope[0]+"&ending="+scope[1];// 'x = M' ok // "x=M' not
-            System.out.println(addresse);
-         //Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/engine/work").header("accept", "application/json").field("beginning", scope[0]).field("file", "file.csv").field("ending", scope[1]).asJsonAsync();
             Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/index/find").header("accept", "application/json").field("beginning", scope[0]).field("query", query).field("ending", scope[1]).asJsonAsync();
-            System.out.println("qsdf");
-
-            futures.add(future);
+            entry.getValue().put("address", entry.getKey());
+            entry.getValue().put("future", future);
         }
 
-        for(Future<HttpResponse<JsonNode>> future : futures){
+        //for(Future<HttpResponse<JsonNode>> future : futures){
+        for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
             try {
+                Future<HttpResponse<JsonNode>> future = (Future<HttpResponse<JsonNode>>) entry.getValue().get("future");
                 HttpResponse<JsonNode> response = future.get();
                 String result = response.getBody().getObject().toString();
                 JSONObject jsonObj = new JSONObject(result);
-                String  response_string = jsonObj.getString("response");
-                compute += response_string;
+                //String  response_string = jsonObj.getString(key);
+                entry.getValue().put("response", jsonObj);
+                entry.getValue().remove("heap");
+                entry.getValue().remove("future");
+                json.put(entry.getKey(),entry.getValue());
             }
             catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
 
-        return compute;
+        return json.toString();
     }
     public static int countLines(String filename) throws IOException {
         InputStream is = new BufferedInputStream(new FileInputStream(filename));

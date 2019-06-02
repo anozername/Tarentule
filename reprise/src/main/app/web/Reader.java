@@ -15,7 +15,7 @@ public class Reader {
         main.app.core.search.CSVReader reader = new main.app.core.search.CSVReader(file);
         Index index = new Index(file, reader.readForIndexing());
         parser = new Parser(index);
-        String s = parser.parse("SELECT AVG(passenger_count) WHERE (store_and_fwd_flag = M)");
+        String s = parser.parse("SELECT AVG(passenger_count) WHERE (store_and_fwd_flag = M)");// 'x = M' ok // "x=M' not
         System.out.println(s);
     }
 
