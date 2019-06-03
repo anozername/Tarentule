@@ -1,5 +1,6 @@
 package main.app.core.search;
 
+import com.google.gson.Gson;
 import main.app.core.entity.Index;
 import main.app.core.entity.Lines;
 import java.text.SimpleDateFormat;
@@ -182,7 +183,9 @@ public class Parser {
             }
         }
 
-        return getLinesSelect(resultsLines, typeSelection);
+       // return getLinesSelect(resultsLines, typeSelection);
+        Gson gson = new Gson();
+        return gson.toJson(resultsLines);
     }
 
     public Lines getResults() {

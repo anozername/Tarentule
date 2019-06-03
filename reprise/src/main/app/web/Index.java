@@ -44,17 +44,13 @@ public class Index {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/find")
-    public String getIndex(@FormParam("beginning") int beginning, @FormParam("query") String query, @FormParam("ending") int ending) {
+    public Response getIndex(@FormParam("beginning") int beginning, @FormParam("query") String query, @FormParam("ending") int ending) {
         insertion_test(beginning, ending);
         String result = parser.parse(query);
-        JSONObject lines = new JSONObject();
-        int nb = 0;
-        for (String line:result.split("\n")) {
-            lines.put("nb "+nb, line);
-            nb++;
-        }
         //return result;
-        return lines.toString();
+        //return lines.toString();
+        return Response.status(Response.Status.OK).entity(new ResponseQuery(result)).build();
+
     }
 
 
@@ -77,14 +73,10 @@ public class Index {
     }
 
     public class ResponseQuery {
-        public JSONObject lines = new JSONObject();
+        public String response;
 
         ResponseQuery(String response) {
-            int nb = 0;
-            for (String line:response.split("\n")) {
-                this.lines.put("nb "+nb, line);
-                nb++;
-            }
+            this.response = response;
         }
     }
 }

@@ -1,16 +1,19 @@
 package main.app.engine;
 
+import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.Main;
+import main.app.core.entity.Lines;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -70,11 +73,20 @@ public class LoadBalancer {
             entry.getValue().put("future", future);
         }
 
+        ArrayList<String> lines = new ArrayList<String>();  ;
         //for(Future<HttpResponse<JsonNode>> future : futures){
+        Lines li = new Lines();
         for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
             try {
                 Future<HttpResponse<JsonNode>> future = (Future<HttpResponse<JsonNode>>) entry.getValue().get("future");
                 HttpResponse<JsonNode> response = future.get();
+                String result = response.getBody().getObject().toString();
+                JSONObject jsonObj = new JSONObject(result);
+                String  response_string = jsonObj.getString("response");
+                Gson g = new Gson();
+                li.addAll(g.fromJson(response_string, Lines.class));
+                //lines.addAll(Arrays.asList(response_string.split("\n")));
+                /*
                 String result = response.getBody().getObject().toString();
                 JSONObject jsonObj = new JSONObject(result);
                 //String  response_string = jsonObj.getString(key);
@@ -82,13 +94,14 @@ public class LoadBalancer {
                 entry.getValue().remove("heap");
                 entry.getValue().remove("future");
                 json.put(entry.getKey(),entry.getValue());
+                */
             }
             catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
 
-        return json.toString();
+        return li.toString();
     }
 
     public static int countLines(String filename) throws IOException {
