@@ -79,40 +79,19 @@ public class CSVFinder {
     }
 
     public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queries, List<String> groupBy, List<Object[]> lines, int compute){
-        List<List<Object[]>> groupedRes = new ArrayList<>();
-        List<Object[]> res;
+        System.out.println("OK");
+        List<Object[]> res = new ArrayList<>();
         List<Integer> indicesGroup = new ArrayList<>();
         boolean satisfaction;
-        int friend = 0;
-        boolean added = false;
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
         for (Object[] line : lines) {
             satisfaction = getSatisfaction(queries, line, compute);
             if (satisfaction) {
-                for (List<Object[]> group : groupedRes) {
-                    for (Integer i : indicesGroup) {
-                        if (line[i].equals(group.get(0)[i])) friend++;
-                        else friend = 0;
-                    }
-                    if (friend == indicesGroup.size()) {
-                        group.add(line);
-                        friend = 0;
-                        added = true;
-                    }
-                }
-                if (!added) {
-                    res = new ArrayList<>();
-                    res.add(line);
-                    groupedRes.add(res);
-                }
-                added = false;
+                System.out.println(GBHelper.placeToInsert(indicesGroup, line, res) + "ok");
+                res.add(GBHelper.placeToInsert(indicesGroup, line, res), line);
             }
-        }
-        res = new ArrayList<>();
-        for (List<Object[]> l : groupedRes) {
-            res.addAll(l);
         }
         System.out.println("pimp 3");
         // System.out.println(res);
@@ -120,50 +99,29 @@ public class CSVFinder {
     }
 
     public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queries, List<String> groupBy, int compute){
-        List<List<Object[]>> groupedRes = new ArrayList<>();
-        List<Object[]> res;
+        List<Object[]> res = new ArrayList<>();
         List<Integer> indicesGroup = new ArrayList<>();
         boolean satisfaction;
-        int friend = 0;
         String lineSTR;
         List<Object> line;
-        boolean added = false;
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
+        System.out.println(csvFile);
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((lineSTR = br.readLine()) != null) {
+
                 line = CSVHelper.read(lineSTR.split(cvsSplitBy));
                 satisfaction = getSatisfaction(queries, line.toArray(), compute);
+
                 if (satisfaction) {
-                    for (List<Object[]> group : groupedRes) {
-                        for (Integer i : indicesGroup) {
-                            if (line.get(i).equals(group.get(0)[i])) friend++;
-                            else friend = 0;
-                        }
-                        if (friend == indicesGroup.size()) {
-                            group.add(line.toArray());
-                            friend = 0;
-                            added = true;
-                        }
-                    }
-                    if (!added) {
-                        res = new ArrayList<>();
-                        res.add(line.toArray());
-                        groupedRes.add(res);
-                    }
-                    added = false;
+                   // System.out.println(GBHelper.placeToInsert(indicesGroup, line.toArray(), res) + "ok\n" + res);
+                    res.add(GBHelper.placeToInsert(indicesGroup, line.toArray(), res), line.toArray());
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        res = new ArrayList<>();
-        for (List<Object[]> l : groupedRes) {
-            res.addAll(l);
-        }
-        System.out.println("pimp 4");
-        // System.out.println(res);
         return res;
     }
 

@@ -15,7 +15,7 @@ public class CSVHelper {
     private static List<String> nameIndexes;
     private static List<Object> types = new ArrayList<>();
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-    private static final String csvFile = Main.file_path;
+    private static final String csvFile = "../tinyload.csv";//Main.file_path;
 
     private static HashMap<Object, Integer>[] indexes;
 
