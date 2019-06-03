@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class CastHelper {
 
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static Optional<Date> castToDate(String data) {
         try {
