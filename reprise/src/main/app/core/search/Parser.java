@@ -151,7 +151,8 @@ public class Parser {
                     and = false;
                 }
                 if (or) {
-                    resultsLines = resultsLines.OR(getResults());
+                    resultsLines = resultsLines.OR(getResults(), groupBy);
+
                     or = false;
                 }
 
@@ -183,9 +184,9 @@ public class Parser {
             }
         }
 
-       // return getLinesSelect(resultsLines, typeSelection);
-        Gson gson = new Gson();
-        return gson.toJson(resultsLines);
+       // Gson gson = new Gson();
+        //return gson.toJson(resultsLines);
+        return resultsLines.toString();
     }
 
     public Lines getResults() {

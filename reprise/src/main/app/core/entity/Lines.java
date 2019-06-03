@@ -1,6 +1,8 @@
 package main.app.core.entity;
 
 import main.app.core.search.CSVHelper;
+import main.app.core.search.GBHelper;
+
 import java.util.*;
 
 public class Lines extends ArrayList<Object[]> {
@@ -90,6 +92,30 @@ public class Lines extends ArrayList<Object[]> {
         return res;
     }
 
+    public Lines OR(Lines lines, List<String> groupBy) {
+        if (groupBy.isEmpty()) return OR(lines);
+        else return ORGB(lines, groupBy);
+    }
+
+    public Lines ORGB(Lines lines, List<String> groupBy) {
+        Lines res = new Lines();
+        List<Integer> indicesGroup = new ArrayList<>();
+        res.addAll(this);
+        int acc = 0;
+        if (this.isEmpty()) return lines;
+        for (String attribute : groupBy) {
+            indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
+        }
+        for (Object[] line : lines) {
+            if (!rechercheDicho((Integer) line[posID])) {
+                acc = GBHelper.placeToInsert(indicesGroup, line, res);
+                res.add(acc, line);
+                System.out.println(res);
+            }
+        }
+        return res;
+    }
+
     public Lines OR(Lines lines) {
         Lines res = new Lines();
         res.addAll(this);
@@ -171,13 +197,6 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Integer getCountWithSelect(String selection) {
-        int nb_lines = 0;
-        for (int i = 0; i < this.size(); i++){
-            if (i >= 50000) {
-                nb_lines++;
-            }
-        }
-
         return this.size();
     }
 
