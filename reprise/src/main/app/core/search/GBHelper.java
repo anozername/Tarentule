@@ -45,10 +45,12 @@ public class GBHelper {
             if (res.get(i)[affinity] instanceof Integer) v2 = (double)((Integer)res.get(i)[affinity]).intValue();
             else v2 = (Double)res.get(i)[affinity];
             i++;
-            System.out.println(v1 + ", " +  v2 + ", " + i + ", " + to);
+            System.out.println(line[0] + " " + v1 + ", " +  v2 + ", " + i + ", " + from + ", " + to);
         } while (i < to && v1 > v2);
-        if (v1 < v2 ) return to(affinity, line, res, i-1, to);
-        return to(affinity, line, res, i, to);
+        if (i == to) {
+            return i;
+        }
+        return to(affinity, line, res, i-1, to);
     }
 
     public static int placeToInsert(List<Integer> affinities, Object[] line, List<Object[]> res) {
@@ -59,7 +61,7 @@ public class GBHelper {
             if (CSVHelper.getTypes().get(affinity).equals("double")) {
                 from = fromDoubleVersion(affinity, line, res, from, to);
                 to = toDoubleVersion(affinity, line, res, from, to);
-                if (from == to) {
+                if (from+1 == to) { //from == to
                     return from;
                 }
             }

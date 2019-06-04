@@ -78,15 +78,28 @@ public class Lines extends ArrayList<Object[]> {
 
     /********************************************************		find		*/
 
-    public Lines AND(Lines lines) {
+    public Lines AND(Lines lines, List<String> groupBy) {
         int compare;
         Lines res = new Lines();
-        for (Object[] ls1 : this) {
-            for (Object[] ls2 : lines) {
-                if ((compare = ((Integer)ls1[posID]).compareTo((Integer)ls2[posID])) == 0) {
-                    res.add(ls1);
+        if (groupBy.isEmpty()) {
+            for (Object[] ls1 : this) {
+                for (Object[] ls2 : lines) {
+                    if ((compare = ((Integer) ls1[posID]).compareTo((Integer) ls2[posID])) == 0) {
+                        res.add(ls1);
+                        break;
+                    }
+                    if (compare < 0) break;
                 }
-                if (compare < 0) break;
+            }
+        }
+        else {
+            for (Object[] ls1 : this) {
+                for (Object[] ls2 : lines) {
+                    if (ls1[posID].equals(ls2[posID])) {
+                        res.add(ls1);
+                        break;
+                    }
+                }
             }
         }
         return res;
@@ -111,6 +124,7 @@ public class Lines extends ArrayList<Object[]> {
                 acc = GBHelper.placeToInsert(indicesGroup, line, res);
                 res.add(acc, line);
                 System.out.println(res);
+                System.out.println(acc);
             }
         }
         return res;
