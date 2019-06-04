@@ -11,6 +11,7 @@ import java.util.*;
 public class CSVReader {
 
     private String csvFile;
+    //WTF
     private int line_max = 9000000;
 
     private static HashMap<Object, Integer>[] indexes;

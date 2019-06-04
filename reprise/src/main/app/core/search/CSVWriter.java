@@ -26,8 +26,8 @@ public class CSVWriter {
             line = lines.skip(from);
             Iterator<String> iter = line.iterator();
             try (FileWriter writer = new FileWriter(name)) {
-                for (int i = 1; i < to; i++) {
-                    writer.write(i + "," + iter.next() + "\n");
+                for (int i = 0; i < to; i++) {
+                    writer.write((from+i) + "," + iter.next() + "\n");
                 }
             }
         } catch(Exception e){
