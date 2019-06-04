@@ -23,6 +23,7 @@ public class GBHelper {
             igline++;
 
         } while (igline < to && v1 > v2);
+        if (igline == to && v1 > v2) return igline;
         return igline-1;
     }
 
@@ -38,6 +39,9 @@ public class GBHelper {
     public static int toDoubleVersion(Integer affinity, Object[] line, List<Object[]> res, int from, int to) {
         int i = from;
         double v1, v2;
+        if (from == to) {
+            return from;
+        }
         do {
 
             if (line[affinity] instanceof Integer) v1 = (double)((Integer)line[affinity]).intValue();
@@ -47,21 +51,19 @@ public class GBHelper {
             i++;
             System.out.println(line[0] + " " + v1 + ", " +  v2 + ", " + i + ", " + from + ", " + to);
         } while (i < to && v1 > v2);
-        if (i == to) {
-            return i;
-        }
         return to(affinity, line, res, i-1, to);
     }
 
     public static int placeToInsert(List<Integer> affinities, Object[] line, List<Object[]> res) {
         int from = 0;
         int to = res.size();
+        int acc = from;
         if (res.isEmpty()) return 0;
         for (Integer affinity : affinities) {
             if (CSVHelper.getTypes().get(affinity).equals("double")) {
                 from = fromDoubleVersion(affinity, line, res, from, to);
                 to = toDoubleVersion(affinity, line, res, from, to);
-                if (from+1 == to) { //from == to
+                if (from == to) { //from == to
                     return from;
                 }
             }
