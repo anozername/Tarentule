@@ -10,13 +10,22 @@ public class Parser {
 
     private Map<String, Object> indexTMP = new HashMap<>();
     private Map<String, Object> notIndexTMP = new HashMap<>();
-    private List<String> selection = new ArrayList<>();
-    private List<String> groupBy = new ArrayList<>();
+    private static List<String> selection = new ArrayList<>();
+    private static int sel = 0;
+    private static List<String> groupBy = new ArrayList<>();
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
     private Index index;
 
     public Parser(Index index) {
         this.index = index;
+    }
+
+    public static List<String> getGroupBy() {
+        return groupBy;
+    }
+
+    public static List<String> getSelection() {
+        return selection;
     }
 
     public void groupBy(List<String[]> cmds) {
@@ -48,10 +57,11 @@ public class Parser {
         }
     }
 
-    public String getLinesSelect(Lines lines, int select) {
-        switch (select) {
+    public static String getLinesSelect(Lines lines) {
+        System.out.println(sel);
+        switch (sel) {
             case 0:
-                return lines.getLinesWithSelect(selection).toString();
+                return lines.getLinesWithSelect(selection).printer();
             case 1:
                 return "count: " + lines.getCountWithSelect(selection.get(0)).toString();
             case 2:
@@ -63,7 +73,7 @@ public class Parser {
             case 5:
                 return "sum :" + lines.getSumWithSelect(selection.get(0));
         }
-        return lines.toString();
+        return lines.printer();
     }
 
     public String parse(String command) {
@@ -71,6 +81,7 @@ public class Parser {
         notIndexTMP.clear();
         selection.clear();
         groupBy.clear();
+        sel = 0;
         boolean and = false;
         boolean or = false;
         Lines resultsLines = new Lines();
@@ -83,11 +94,10 @@ public class Parser {
         int acc = 1;
         int accCMDS = 0;
         int ind;
-        int typeSelection = 0;
         groupBy(cmds);
         if (cmds.get(accCMDS)[0].equals("SELECT")) {
-            typeSelection = selectType(cmds.get(accCMDS)[acc].replace(",", ""));
-            if (typeSelection != 0) {
+            sel = selectType(cmds.get(accCMDS)[acc].replace(",", ""));
+            if (sel != 0) {
                 accCMDS++;
                 acc = 0;
                 while (acc < cmds.get(accCMDS).length) {
@@ -157,7 +167,7 @@ public class Parser {
                 }
 
                 //ou = 0 et taille = 1 mais pas tout de suite OK
-                if (accCMDS == 2 || (accCMDS == 4 && typeSelection != 0)) {
+                if (accCMDS == 2 || (accCMDS == 4 && sel != 0)) {
                     resultsLines = getResults();
                 }
 
@@ -184,9 +194,9 @@ public class Parser {
             }
         }
 
-       // Gson gson = new Gson();
-        //return gson.toJson(resultsLines);
-        return resultsLines.toString();
+        Gson gson = new Gson();
+        return gson.toJson(resultsLines);
+        //return resultsLines.toString();
     }
 
     public Lines getResults() {

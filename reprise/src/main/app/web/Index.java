@@ -16,19 +16,22 @@ public class Index {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Lines string(@QueryParam("query") String query) throws Exception{
+    public String string(@QueryParam("query") String query) throws Exception{
         LoadBalancer loadBalancer = new LoadBalancer();
         System.out.println("query :'"+query+"'");
-        return loadBalancer.distribute(query);
+        String result = loadBalancer.distribute(query);
+        System.out.println(result);
+
+        return result;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/json")
-    public Lines json(@QueryParam("query") String query) throws Exception{
+    public String json(@QueryParam("query") String query) throws Exception{
         LoadBalancer loadBalancer = new LoadBalancer();
         System.out.println("query :'"+query+"'");
-        Lines result = loadBalancer.distribute(query);
+        String result = loadBalancer.distribute(query);
         return result;
     }
 
@@ -65,20 +68,10 @@ public class Index {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(beginning, ending);
+        writer.writeCSVFile(beginning, ending-1);
         CSVReader reader = new CSVReader(file);
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
         parser = new Parser(index);
-    }
-
-    public static Parser insertion_static(int beginning, int ending) {
-        CSVHelper.determineColumnsAndTypes();
-        String file = "test.csv";
-        CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(beginning, ending);
-        CSVReader reader = new CSVReader(file);
-        main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
-        return new Parser(index);
     }
 
     public class ResponseQuery {

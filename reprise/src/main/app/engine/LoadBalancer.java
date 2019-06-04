@@ -7,6 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.Main;
 import main.app.core.entity.Lines;
+import main.app.core.search.Parser;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -52,8 +53,9 @@ public class LoadBalancer {
         return new int[]{beginning, ending};
     }
 
-    public Lines distribute(String query){
+    public String distribute(String query){
         //TODO parallelize ?
+        Gson g = new Gson();
         String compute = "";
         JSONObject json = new JSONObject();
 
@@ -77,32 +79,54 @@ public class LoadBalancer {
         ArrayList<String> lines = new ArrayList<String>();
         //for(Future<HttpResponse<JsonNode>> future : futures){
         Lines li = new Lines();
-        for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
-            try {
-                Future<HttpResponse<JsonNode>> future = (Future<HttpResponse<JsonNode>>) entry.getValue().get("future");
-                HttpResponse<JsonNode> response = future.get();
-                String result = response.getBody().getObject().toString();
-                JSONObject jsonObj = new JSONObject(result);
-                //System.out.println("JSONObject : '"+jsonObj.toString()+"'");
-                String response_string = jsonObj.getString("response");
-                li.addAll(String2Lines(jsonObj.getString("response")));
-                //li.addAll(g.fromJson(String2Lines(response_string), Lines.class));
-                //lines.addAll(Arrays.asList(response_string.split("\n")));
-                /*
-                String result = response.getBody().getObject().toString();
-                JSONObject jsonObj = new JSONObject(result);
-                //String  response_string = jsonObj.getString(key);
-                entry.getValue().put("response", jsonObj);
-                entry.getValue().remove("heap");
-                entry.getValue().remove("future");
-                json.put(entry.getKey(),entry.getValue());
-                */
-            }
-            catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+
+        if (Parser.getGroupBy().isEmpty()) {
+            for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
+                try {
+                    Future<HttpResponse<JsonNode>> future = (Future<HttpResponse<JsonNode>>) entry.getValue().get("future");
+                    HttpResponse<JsonNode> response = future.get();
+                    String result = response.getBody().getObject().toString();
+                    JSONObject jsonObj = new JSONObject(result);
+                    //System.out.println("JSONObject : '"+jsonObj.toString()+"'");
+                    String response_string = jsonObj.getString("response");
+                   // System.out.println("String2Lines(response_string)"+String2Lines(response_string)+"'");
+                    //li.addAll(g.fromJson(result, Lines.class));
+                    System.out.println("li"+li+"'");
+                   // li.addAll(String2Lines(response_string));
+                    System.out.println("li"+li+"'");
+                    li.addAll(g.fromJson(response_string, Lines.class));
+                    //lines.addAll(Arrays.asList(response_string.split("\n")));
+                    /*
+                    String result = response.getBody().getObject().toString();
+                    JSONObject jsonObj = new JSONObject(result);
+                    //String  response_string = jsonObj.getString(key);
+                    entry.getValue().put("response", jsonObj);
+                    entry.getValue().remove("heap");
+                    entry.getValue().remove("future");
+                    json.put(entry.getKey(),entry.getValue());
+                    */
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        return li;
+        else {
+            System.out.println("merde");
+            for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
+                try {
+                    Future<HttpResponse<JsonNode>> future = (Future<HttpResponse<JsonNode>>) entry.getValue().get("future");
+                    HttpResponse<JsonNode> response = future.get();
+                    String result = response.getBody().getObject().toString();
+                    JSONObject jsonObj = new JSONObject(result);
+                    String response_string = jsonObj.getString("response");
+                    li = li.compute(g.fromJson(response_string, Lines.class), Parser.getGroupBy());
+
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return Parser.getLinesSelect(li);
     }
 
     private Lines String2Lines (String raw){

@@ -28,6 +28,25 @@ public class Lines extends ArrayList<Object[]> {
         super();
     }
 
+    //like an ORGB but not
+    public Lines compute(Lines lines, List<String> groupBy) {
+
+        Lines res = new Lines();
+        List<Integer> indicesGroup = new ArrayList<>();
+        res.addAll(this);
+        int acc = 0;
+        for (String attribute : groupBy) {
+            indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
+        }
+        if (this.isEmpty()) return lines.toGB(indicesGroup);
+        if (lines.isEmpty()) return this.toGB(indicesGroup);
+        for (Object[] line : lines) {
+            acc = GBHelper.placeToInsert(indicesGroup, line, res);
+            res.add(acc, line);
+        }
+        return res;
+    }
+
     public static Lines createLines(List<List<Object[]>> list) {
         Lines res = new Lines();
         for (List<Object[]> l : list) {
@@ -149,6 +168,7 @@ public class Lines extends ArrayList<Object[]> {
         Lines res = new Lines();
         res.addAll(this);
         if (this.isEmpty()) return lines;
+        if (lines.isEmpty()) return this;
         for (Object[] line : lines) {
             if (!rechercheDicho((Integer)line[posID])) res.add(line);
         }
@@ -303,7 +323,19 @@ public class Lines extends ArrayList<Object[]> {
 
     /********************************************************		print		*/
 
-    public String toString() {
+    public String printer() {
+        StringBuffer sb = new StringBuffer();
+        for (Object[] line : this) {
+            sb.append("[");
+            for (Object e : line) {
+                sb.append(e.toString() + ", ");
+            }
+            sb.append("]");
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+    /*public String toString() {
         StringBuffer sb = new StringBuffer();
         /*
         for (Object[] line : this) {
@@ -314,7 +346,7 @@ public class Lines extends ArrayList<Object[]> {
             sb.append("]");
             sb.append("\n");
         }
-        */
+
         for (Iterator<Object[]> iter = this.iterator(); iter.hasNext();) {
             Object[] line = iter.next();
             sb.append("[");
@@ -328,7 +360,7 @@ public class Lines extends ArrayList<Object[]> {
 
         }
         return sb.toString();
-    }
+    }*/
 
     public Lines computeResults(Lines l, int compute) {
         //if (l == null) return new ArrayList<>();
