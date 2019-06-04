@@ -16,7 +16,7 @@ public class Reader {
         main.app.core.search.CSVReader reader = new main.app.core.search.CSVReader(file);
         Index index = new Index(file, reader.readForIndexing());
         parser = new Parser(index);
-        String s = parser.parse("SELECT * WHERE (trip_distance = 1.9) OR (vendor_id = CMT) GROUPBY rate_code, total_amount");// 'x = M' ok // "x=M' not
+        String s = parser.parse("SELECT * WHERE (passenger_count = 1 AND rate_code = 1 OR surcharge = 0) GROUPBY rate_code, total_amount");// 'x = M' ok // "x=M' not
         System.out.println(s);
     }
 

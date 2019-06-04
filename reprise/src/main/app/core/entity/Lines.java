@@ -78,15 +78,34 @@ public class Lines extends ArrayList<Object[]> {
 
     /********************************************************		find		*/
 
-    public Lines AND(Lines lines) {
+    public Lines AND(Lines lines, List<String> groupBy) {
         int compare;
         Lines res = new Lines();
-        for (Object[] ls1 : this) {
-            for (Object[] ls2 : lines) {
-                if ((compare = ((Integer)ls1[posID]).compareTo((Integer)ls2[posID])) == 0) {
-                    res.add(ls1);
+        if (this.isEmpty() || lines.isEmpty()) return this;
+        if (groupBy.isEmpty()) {
+            for (Object[] ls1 : this) {
+                for (Object[] ls2 : lines) {
+                    if ((compare = ((Integer) ls1[posID]).compareTo((Integer) ls2[posID])) == 0) {
+                        res.add(ls1);
+                        break;
+                    }
+                    if (compare < 0) break;
                 }
-                if (compare < 0) break;
+            }
+        }
+        else {
+            List<Integer> indicesGroup = new ArrayList<>();
+            for (String attribute : groupBy) {
+                indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
+            }
+            for (Object[] ls1 : this) {
+                for (Object[] ls2 : lines) {
+                    if (ls1[posID] == ls2[posID]) {
+                        compare = GBHelper.placeToInsert(indicesGroup, ls1, res);
+                        res.add(compare, ls1);
+                        break;
+                    }
+                }
             }
         }
         return res;
@@ -102,16 +121,26 @@ public class Lines extends ArrayList<Object[]> {
         List<Integer> indicesGroup = new ArrayList<>();
         res.addAll(this);
         int acc = 0;
-        if (this.isEmpty()) return lines;
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
+        if (this.isEmpty()) return lines.toGB(indicesGroup);
+        if (lines.isEmpty()) return this.toGB(indicesGroup);
         for (Object[] line : lines) {
             if (!rechercheDicho((Integer) line[posID])) {
                 acc = GBHelper.placeToInsert(indicesGroup, line, res);
                 res.add(acc, line);
-                System.out.println(res);
             }
+        }
+        return res;
+    }
+
+    public Lines toGB(List<Integer> indicesGroup) {
+        Lines res = new Lines();
+        int acc;
+        for (Object[] line : this) {
+                acc = GBHelper.placeToInsert(indicesGroup, line, res);
+                res.add(acc, line);
         }
         return res;
     }
@@ -127,40 +156,11 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Lines getLinesFormatted(List<String> groupBy) {
-        List<List<Object[]>> groupedRes = new ArrayList<>();
-        ArrayList<Object[]> res;
         List<Integer> indicesGroup = new ArrayList<>();
-        boolean added = false;
-        int satisfaction = 0;
-        //if (groupBy.size() == 1 && groupBy.get(0).equals(()))
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
-            for (Object[] line : this) {
-                for (List<Object[]> li : groupedRes) {
-                    for (Integer i : indicesGroup) {
-                        if (line[i].equals(li.get(0)[i])) {
-                            satisfaction++;
-                        } else satisfaction = 0;
-                    }
-                    if (satisfaction == indicesGroup.size()) {
-                        li.add(line);
-                        added = true;
-                    }
-                    satisfaction = 0;
-                }
-                if (!added) {
-                    res = new ArrayList<>();
-                    res.add(line);
-                    groupedRes.add(res);
-                }
-                added = false;
-            }
-        res = new ArrayList<>();
-        for (List<Object[]> l : groupedRes) {
-            res.addAll(l);
-        }
-        return new Lines(res);
+        return toGB(indicesGroup);
     }
 
     public int getPosName(String name) {
@@ -218,7 +218,6 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Double getAvgWithSelect(String selection) {
-        System.out.println(getSumWithSelect(selection) + " " + getCountWithSelect(selection));
         return getSumWithSelect(selection) / getCountWithSelect(selection);
     }
 
@@ -263,7 +262,6 @@ public class Lines extends ArrayList<Object[]> {
 
     //@IDEA peut etre rechercher a partir de sublines a chaque fois car ids donnés dans l'ordre
     public boolean rechercheDicho(Integer val) {
-
         /* déclaration des variables locales à la fonction */
         boolean trouve;
         int id;

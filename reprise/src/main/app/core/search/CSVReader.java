@@ -11,7 +11,6 @@ import java.util.*;
 public class CSVReader {
 
     private String csvFile;
-
     private HashMap<Object, Integer>[] indexes;
 
     public CSVReader(String csvFile) {

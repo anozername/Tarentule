@@ -147,7 +147,7 @@ public class Parser {
 
                 accCMDS++;
                 if (and) {
-                    resultsLines = resultsLines.AND(getResults());
+                    resultsLines = resultsLines.AND(getResults(), groupBy);
                     and = false;
                 }
                 if (or) {
