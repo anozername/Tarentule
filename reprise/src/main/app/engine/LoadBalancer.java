@@ -68,6 +68,7 @@ public class LoadBalancer {
         int[] scope = new int[]{0, 0};
         for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) { // http://localhost:8080/test/index/?query=SELECT AVG(passenger_count) WHERE (store_and_fwd_flag = M)
             scope = balance(scope[1], max, entry.getValue().getInt("processor"));
+            System.out.println("address : '"+entry.getKey()+"', query : '"+query+"', beggeinning : '"+scope[0]+"', ending : '"+scope[1]+"'");
             Future<HttpResponse<JsonNode>> future = Unirest.post("http://"+entry.getKey()+"/test/index/find").header("accept", "application/json").field("beginning", scope[0]).field("query", query).field("ending", scope[1]).asJsonAsync();
             entry.getValue().put("address", entry.getKey());
             entry.getValue().put("future", future);
@@ -83,6 +84,7 @@ public class LoadBalancer {
                 String result = response.getBody().getObject().toString();
                 JSONObject jsonObj = new JSONObject(result);
                 String  response_string = jsonObj.getString("response");
+                System.out.println(response_string);
                 Gson g = new Gson();
                 li.addAll(g.fromJson(response_string, Lines.class));
                 //lines.addAll(Arrays.asList(response_string.split("\n")));

@@ -1,23 +1,38 @@
 package main.app.engine;
 
+import com.google.gson.Gson;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import main.app.core.entity.Lines;
+import main.app.core.search.Parser;
+import org.json.JSONObject;
+
+import javax.sound.sampled.Line;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 
-public class Node extends RecursiveTask<Long> {
-    private long result = 0;
+public class Node extends RecursiveTask<Lines> {
+    private Lines result = new Lines();
     private boolean balanced;
     private int beginning;
+    private String file;
+    private String query;
     private int ending;
 
     private Node(boolean balanced){
         this.balanced = balanced;
         System.out.println(balanced+" nodding..."); // bad pun
     }
-    public Node(boolean balanced, int beginning, int ending){
+    public Node(boolean balanced, int beginning, String file, String query, int ending){
         this.balanced = balanced;
         this.beginning = beginning;
+        this.file = file;
+        this.query = query;
         this.ending = ending;
         System.out.println(balanced+" nodding from "+this.beginning+" to "+this.ending+"."); // very bad pun
     }
@@ -30,40 +45,58 @@ public class Node extends RecursiveTask<Long> {
         return new ForkJoinPool(benchmarking());
     }
 
-    private long work(){
-        long work = 0;
-        for(int i = 0; i<111000; i++){
-            work += (long)(Math.random() * ((100 - 1) + 1)) + 1;
+    private String work(int beginning, String file, String query, int ending) {
+        String answer = "[[1,\"CMT\",\"2013-04-04 18:47:45\",\"Apr 4, 2013, 7:00:25 PM\",1,2.5,-73.957855,40.76532,1,\"M\",-73.976274,40.785647,\"CRD\",11,1,0.5,2.5,0,15],[2,\"CMT\",\"2013-04-05 07:08:34\",\"Apr 5, 2013, 7:17:34 AM\",1,1.6,0,0,1,\"M\",0,0,\"CRD\",8.5,0,0.5,1.8,0,10.8]]";
+        Future<HttpResponse<JsonNode>> future = Unirest.post("http://localhost:8080/test/index/find").header("accept", "application/json").field("beginning", 1).field("query", "SELECT * WHERE (store_and_fwd_flag = M)").field("ending", 4).asJsonAsync();
+        String result = "";
+        String work = "";
+        try {
+            HttpResponse<JsonNode> response = future.get();
+            result += response.getBody().getObject().toString();
+            JSONObject jsonObj = new JSONObject(result);
+            work += jsonObj.getString("response");
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-
-        return work;
+        System.out.println("vs");
+        if (answer.equals(work)) {
+            System.out.println("work : '" + work + "'");
+            return work;
+        } else {
+            System.out.println("didn't work : '" + work + "'");
+            System.out.println("--------------'"+answer +"'");
+            return answer;
+        }
     }
 
-    private long divide() {
+    private Lines divide (int beginning, String file, String query, int ending) {
         List<Node> list = new ArrayList<>();
         for (int j = 0; j < 10; j++) {
             if (j % 2 == 0) {
-                Node scrapper = new Node(false);
+                Node scrapper = new Node(false, beginning, file, query, ending);
                 list.add(scrapper);
                 scrapper.fork();
             }
         }
 
         for (Node f : list){
-            result += f.join();
+            result.addAll(f.join());
         }
 
         return result;
     }
 
-    protected Long compute() {
-        long compute = 0;
+
+    protected Lines  compute() {
+        Lines compute = new Lines();
         try {
             if (balanced){
-                compute = this.divide();
+                compute = divide(this.beginning,this.file,this.query,this.ending);
             }
             else {
-                compute += work();
+                String response = work(this.beginning,this.file,this.query,this.ending);
+                Gson g = new Gson();
+                compute.addAll(g.fromJson(response, Lines.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
