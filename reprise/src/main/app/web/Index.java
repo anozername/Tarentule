@@ -2,6 +2,8 @@ package main.app.web;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+
+import main.app.core.entity.Lines;
 import main.app.core.search.*;
 import main.app.engine.LoadBalancer;
 import org.json.JSONObject;
@@ -14,23 +16,20 @@ public class Index {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String string(@QueryParam("query") String query) throws Exception{
+    public Lines string(@QueryParam("query") String query) throws Exception{
         LoadBalancer loadBalancer = new LoadBalancer();
         System.out.println("query :'"+query+"'");
-        String result = loadBalancer.distribute(query);
-
-        return result;
+        return loadBalancer.distribute(query);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/json")
-    public Response json(@QueryParam("query") String query) throws Exception{
+    public Lines json(@QueryParam("query") String query) throws Exception{
         LoadBalancer loadBalancer = new LoadBalancer();
         System.out.println("query :'"+query+"'");
-        String result = loadBalancer.distribute(query);
-
-        return Response.status(Response.Status.OK).entity(result).build();
+        Lines result = loadBalancer.distribute(query);
+        return result;
     }
 
     @GET
@@ -66,16 +65,21 @@ public class Index {
         CSVHelper.determineColumnsAndTypes();
         String file = "test.csv";
         CSVWriter writer = new CSVWriter(file);
-        writer.writeCSVFile(beginning, ending-1); //TODO rm "-1'
+        writer.writeCSVFile(beginning, ending);
         CSVReader reader = new CSVReader(file);
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
         parser = new Parser(index);
     }
 
     public class ResponseQuery {
-        public String response;
-
+        String response;
         ResponseQuery(String response) {
+            this.response = response;
+        }
+    }
+    public class ResponseIndex {
+        Lines response;
+        ResponseIndex(Lines response) {
             this.response = response;
         }
     }

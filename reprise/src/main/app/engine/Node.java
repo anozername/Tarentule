@@ -46,18 +46,21 @@ public class Node extends RecursiveTask<Lines> {
     }
 
     private String work(int beginning, String file, String query, int ending) {
-        String answer = "[[1,\"CMT\",\"2013-04-04 18:47:45\",\"Apr 4, 2013, 7:00:25 PM\",1,2.5,-73.957855,40.76532,1,\"M\",-73.976274,40.785647,\"CRD\",11,1,0.5,2.5,0,15],[2,\"CMT\",\"2013-04-05 07:08:34\",\"Apr 5, 2013, 7:17:34 AM\",1,1.6,0,0,1,\"M\",0,0,\"CRD\",8.5,0,0.5,1.8,0,10.8]]";
-        Future<HttpResponse<JsonNode>> future = Unirest.post("http://localhost:8080/test/index/find").header("accept", "application/json").field("beginning", 1).field("query", "SELECT * WHERE (store_and_fwd_flag = M)").field("ending", 4).asJsonAsync();
+        String answer = "[1, CMT, Thu Apr 04 18:47:45 CEST 2013, Thu Apr 04 19:00:25 CEST 2013, 1, 2.5, -73.957855, 40.76532, 1, M, -73.976274, 40.785647, CRD, 11, 1, 0.5, 2.5, 0, 15, ]\n[2, CMT, Fri Apr 05 07:08:34 CEST 2013, Fri Apr 05 07:17:34 CEST 2013, 1, 1.6, 0, 0, 1, M, 0, 0, CRD, 8.5, 0, 0.5, 1.8, 0, 10.8, ]";
+        Future<HttpResponse<JsonNode>> future = Unirest.post("http://localhost:8080/test/index/find").header("accept", "application/json").field("beginning", 1).field("query", "SELECT * WHERE (store_and_fwd_flag = M)").field("ending", 3).asJsonAsync();
         String result = "";
         String work = "";
+
         try {
             HttpResponse<JsonNode> response = future.get();
             result += response.getBody().getObject().toString();
             JSONObject jsonObj = new JSONObject(result);
+            System.out.println("JSONObject : '"+jsonObj.toString()+"'"); //TODO debug
             work += jsonObj.getString("response");
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+
         System.out.println("vs");
         if (answer.equals(work)) {
             System.out.println("work : '" + work + "'");

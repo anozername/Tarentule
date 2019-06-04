@@ -307,12 +307,27 @@ public class Lines extends ArrayList<Object[]> {
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
+        /*
         for (Object[] line : this) {
             sb.append("[");
             for (Object e : line) {
                 sb.append(e.toString() + ", ");
             }
-            sb.append("]\n");
+            sb.append("]");
+            sb.append("\n");
+        }
+        */
+        for (Iterator<Object[]> iter = this.iterator(); iter.hasNext();) {
+            Object[] line = iter.next();
+            sb.append("[");
+            for (Object e : line) {
+                sb.append(e.toString() + ", ");
+            }
+            sb.append("]");
+            if (iter.hasNext()){
+                sb.append("\n");
+            }
+
         }
         return sb.toString();
     }

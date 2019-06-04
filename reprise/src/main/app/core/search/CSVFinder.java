@@ -33,8 +33,6 @@ public class CSVFinder {
             e.printStackTrace();
         }
 
-        System.out.println("pimp 0");
-        //System.out.println(linesTMP);
         return linesTMP;
     }
 
@@ -59,8 +57,6 @@ public class CSVFinder {
             e.printStackTrace();
         }
 
-        System.out.println("pimp 1");
-        //System.out.println(res);"
         return res;
     }
 
@@ -73,8 +69,7 @@ public class CSVFinder {
                     res.add(line);
                 }
         }
-        System.out.println("pimp 2");
-        // System.out.println(res);
+
         return res;
     }
 
@@ -93,8 +88,7 @@ public class CSVFinder {
                 res.add(GBHelper.placeToInsert(indicesGroup, line, res), line);
             }
         }
-        System.out.println("pimp 3");
-        // System.out.println(res);
+
         return res;
     }
 
