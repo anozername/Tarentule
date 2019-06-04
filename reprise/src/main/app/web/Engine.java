@@ -23,7 +23,8 @@ import java.util.concurrent.Future;
 public class Engine {
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String getJsonResponse() {
+    public String getStringResponse() {
+        /*
         LoadBalancer loadBalancer = new LoadBalancer();
 
         String response_string = "";
@@ -42,6 +43,11 @@ public class Engine {
 
         return response_string;
         //return Response.status(Response.Status.OK).entity(new ResponseEngine(end - start, result)).build();
+        */
+
+        Node node = new Node(true,1,"dunno","SELECT * WHERE (store_and_fwd_flag = M)",9);
+
+        return node.pool().invoke(node)+""; //compute()
     }
 
     public class ResponseEngine {

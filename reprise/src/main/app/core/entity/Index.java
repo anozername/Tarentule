@@ -9,8 +9,8 @@ import java.util.HashMap;
 
 public class Index {
 
-    private static HashMap<String, MultivaluedMap<Object, Integer>> hashmap;
-    private static CSVFinder finder;
+    private HashMap<String, MultivaluedMap<Object, Integer>> hashmap;
+    private CSVFinder finder;
 
     public Index(String fileName, HashMap hashmap) {
         this.finder = new CSVFinder(fileName);

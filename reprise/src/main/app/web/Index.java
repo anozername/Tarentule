@@ -12,7 +12,7 @@ import org.json.JSONObject;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class Index {
-    private static Parser parser;
+    private Parser parser;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -69,6 +69,16 @@ public class Index {
         CSVReader reader = new CSVReader(file);
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
         parser = new Parser(index);
+    }
+
+    public static Parser insertion_static(int beginning, int ending) {
+        CSVHelper.determineColumnsAndTypes();
+        String file = "test.csv";
+        CSVWriter writer = new CSVWriter(file);
+        writer.writeCSVFile(beginning, ending);
+        CSVReader reader = new CSVReader(file);
+        main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
+        return new Parser(index);
     }
 
     public class ResponseQuery {

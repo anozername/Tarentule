@@ -11,15 +11,14 @@ import java.util.*;
 public class CSVReader {
 
     private String csvFile;
-    private int line_max = 9000000;
 
-    private static HashMap<Object, Integer>[] indexes;
+    private HashMap<Object, Integer>[] indexes;
 
     public CSVReader(String csvFile) {
         this.csvFile = csvFile;
     }
 
-    public static Map<Object, Integer>[] getIndexes() {
+    public Map<Object, Integer>[] getIndexes() {
         return indexes;
     }
 
@@ -31,27 +30,22 @@ public class CSVReader {
         String line = "";
         String cvsSplitBy = ",";
         List<Object> tmp;
-        int line_nb = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             indexes = Arrays.copyOf(CSVHelper.getIndexes(), CSVHelper.getIndexes().length);
             while ((line = br.readLine()) != null) {
-                if (line_nb < line_max){
-                    tmp = new ArrayList<>(CSVHelper.read(line.split(cvsSplitBy)));
-                    for (int pos = 1; pos < indexes.length; pos++) {
-                        if (indexes[pos] != null) {
-                            if (!indexes[pos].containsKey(tmp.get(pos))) {
-                                indexes[pos].put(tmp.get(pos), 1);
-                            } else {
-                                valueTMP = indexes[pos].get(tmp.get(pos)) + 1;
-                                indexes[pos].put(tmp.get(pos), valueTMP);
-                            }
-
+                tmp = new ArrayList<>(CSVHelper.read(line.split(cvsSplitBy)));
+                for (int pos = 1; pos < indexes.length; pos++) {
+                    if (indexes[pos] != null) {
+                        if (!indexes[pos].containsKey(tmp.get(pos))) {
+                            indexes[pos].put(tmp.get(pos), 1);
+                        } else {
+                            valueTMP = indexes[pos].get(tmp.get(pos)) + 1;
+                            indexes[pos].put(tmp.get(pos), valueTMP);
                         }
                     }
-                    tmp.clear();
-                    deleteFatMap();
                 }
-                line_nb++;
+                tmp.clear();
+                deleteFatMap();
             }
             ArrayList<Integer> scores = new ArrayList<>(getScoresForIndexing());
             scores.add(0, null);
@@ -74,7 +68,7 @@ public class CSVReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return readforHashMap(posIndex);
+        return readForHashMap(posIndex);
     }
 
     public void deleteFatMap() {
@@ -101,7 +95,7 @@ public class CSVReader {
         return min;
     }
 
-    public HashMap<String, MultivaluedMap<Object, Integer>> readforHashMap(List<Integer> listIndex) {
+    public HashMap<String, MultivaluedMap<Object, Integer>> readForHashMap(List<Integer> listIndex) {
         String[] trip;
         String line;
         List<Object> tmp;
@@ -112,24 +106,20 @@ public class CSVReader {
         for (Integer indice : listIndex) {
             index.put(CSVHelper.getNameIndexes().get(indice), new MultivaluedHashMap<>());
         }
-        int line_nb = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((line = br.readLine()) != null) {
-                if (line_nb < line_max) {
-                    trip = line.split(cvsSplitBy);
-                    tmp = new ArrayList<>(CSVHelper.read(trip));
-                    for (Integer indice : listIndex) {
-                        htmp = index.get(CSVHelper.getNameIndexes().get(indice));
-                        if (htmp.containsKey(tmp.get(listIndex.get(acc)))) {
-                            htmp.add(tmp.get(listIndex.get(acc)), (Integer) tmp.get(0));
-                        } else {
-                            htmp.putSingle(tmp.get(listIndex.get(acc)), (Integer) tmp.get(0));
-                        }
-                        acc++;
+                trip = line.split(cvsSplitBy);
+                tmp = new ArrayList<>(CSVHelper.read(trip));
+                for (Integer indice : listIndex) {
+                    htmp = index.get(CSVHelper.getNameIndexes().get(indice));
+                    if (htmp.containsKey(tmp.get(listIndex.get(acc)))) {
+                        htmp.add(tmp.get(listIndex.get(acc)), (Integer) tmp.get(0));
+                    } else {
+                        htmp.putSingle(tmp.get(listIndex.get(acc)), (Integer) tmp.get(0));
                     }
-                    acc = 0;
+                    acc++;
                 }
-                line_nb++;
+                acc = 0;
             }
         } catch (IOException e) {
             e.printStackTrace();

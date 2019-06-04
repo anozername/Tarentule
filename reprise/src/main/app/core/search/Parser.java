@@ -8,18 +8,18 @@ import java.util.*;
 
 public class Parser {
 
-    private static Map<String, Object> indexTMP = new HashMap<>();
-    private static Map<String, Object> notIndexTMP = new HashMap<>();
-    private static List<String> selection = new ArrayList<>();
-    private static List<String> groupBy = new ArrayList<>();
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
-    private static Index index;
+    private Map<String, Object> indexTMP = new HashMap<>();
+    private Map<String, Object> notIndexTMP = new HashMap<>();
+    private List<String> selection = new ArrayList<>();
+    private List<String> groupBy = new ArrayList<>();
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+    private Index index;
 
     public Parser(Index index) {
         this.index = index;
     }
 
-    public static void groupBy(List<String[]> cmds) {
+    public void groupBy(List<String[]> cmds) {
         for (String[] cmd : cmds) {
             for (int i = 0; i < cmd.length ; i++) {
                 if (cmd[i].equals("GROUPBY")) {
@@ -279,7 +279,7 @@ public class Parser {
         return linesTMP;
     }
 
-    public static void pushCommand(String cmd, Object value) {
+    public void pushCommand(String cmd, Object value) {
         String[] splitentry;
         String command = cmd;
         if ((splitentry = cmd.split("[ ]")).length == 2) command = splitentry[1];
