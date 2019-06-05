@@ -99,7 +99,6 @@ public class CSVReader {
         String cvsSplitBy = ",";
         MultivaluedMap<Object, Integer> htmp;
         HashMap<String, MultivaluedMap<Object, Integer>> index = new HashMap<>();
-        System.out.println("b");
         for (Integer indice : listIndex) {
             index.put(CSVHelper.getNameIndexes().get(indice), new MultivaluedHashMap<>());
         }
@@ -107,7 +106,6 @@ public class CSVReader {
             while ((line = br.readLine()) != null) {
                 trip = line.split(cvsSplitBy);
                 tmp = new ArrayList<>(CSVHelper.read(trip));
-                System.out.println("WT");
                 for (Integer indice : listIndex) {
                     htmp = index.get(CSVHelper.getNameIndexes().get(indice));
                     if (htmp.containsKey(tmp.get(listIndex.get(acc)))) {
@@ -122,9 +120,7 @@ public class CSVReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("WDDDD");
         return index;
-
     }
 
     public List<Integer> getScoresForIndexing() {

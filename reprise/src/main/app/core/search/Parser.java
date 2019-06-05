@@ -20,6 +20,7 @@ public class Parser {
         this.index = index;
     }
 
+
     public static List<String> getGroupBy() {
         return groupBy;
     }
@@ -193,7 +194,7 @@ public class Parser {
         }
         Gson gson = new Gson();
 
-        return gson.toJson(resultsLines);
+        return resultsLines.printer();
     }
 
     public Lines getResults() {

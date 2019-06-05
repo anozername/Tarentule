@@ -15,6 +15,14 @@ public class CSVHelper {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String csvFile = Main.file_path;
 
+    public static ArrayList<Integer> getPosDateTime() {
+        return posDateTime;
+    }
+
+    public static ArrayList<Integer> getPosDouble() {
+        return posDouble;
+    }
+
     private static HashMap<Object, Integer>[] indexes;
 
     public static List<String> getNameIndexes() {
@@ -45,7 +53,9 @@ public class CSVHelper {
             try {
                 it = CastHelper.castToInteger(line[i].toString());
                 if (it.isPresent()) {
+                    System.out.println("OUI"+line[i]);
                     tmp.set(i, Integer.parseInt(line[i].toString()));
+                    System.out.println("tmp"+tmp.get(i));
                 }
                 else {
                     tmp.set(i, Double.parseDouble(line[i].toString()));

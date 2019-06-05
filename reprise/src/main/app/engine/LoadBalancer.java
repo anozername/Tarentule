@@ -6,6 +6,8 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import main.Main;
 import main.app.core.entity.Lines;
+import main.app.core.search.CSVHelper;
+import main.app.core.search.CastHelper;
 import main.app.core.search.Parser;
 import org.json.JSONObject;
 import java.util.*;
@@ -46,7 +48,11 @@ public class LoadBalancer {
                     String result = response.getBody().getObject().toString();
                     JSONObject jsonObj = new JSONObject(result);
                     String response_string = jsonObj.getString("response");
-                    li.addAll(g.fromJson(response_string, Lines.class));
+                    //System.out.println("qsdf"+response_string);
+                    //System.out.println(g.fromJson(response_string, Lines.class).get(0)[0].getClass());
+                    //System.out.println(g.fromJson(response_string, Lines.class).get(0)[0]);
+                    li.addAll(String2Lines(response_string));
+                    System.out.println(li.get(0)[0]);
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -59,7 +65,7 @@ public class LoadBalancer {
                     HttpResponse<JsonNode> response = future.get();
                     String result = response.getBody().getObject().toString();
                     String response_string = new JSONObject(result).getString("response");
-                    li = li.compute(g.fromJson(response_string, Lines.class), Parser.getGroupBy());
+                    li = li.compute(String2Lines(response_string), Parser.getGroupBy());
 
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
@@ -72,9 +78,7 @@ public class LoadBalancer {
     private Lines String2Lines (String raw){ //DO NOT SUPP, cute
         Lines lines = new Lines();
         String[] array = raw.split("\n");
-        List<Object[]> arrayList = new ArrayList();
-        arrayList.add(array);
-        lines.setLines(arrayList);
+        for (String s : array) lines.add(CSVHelper.read(s.split(",")).toArray());
         return lines;
     }
 }

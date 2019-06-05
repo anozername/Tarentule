@@ -68,7 +68,7 @@ public class Lines extends ArrayList<Object[]> {
     public Lines AND(Lines lines, List<String> groupBy) {
         int compare;
         Lines res = new Lines();
-        if (this.isEmpty() || lines.isEmpty()) return this;
+        if (this.isEmpty() || lines.isEmpty()) return new Lines();
         if (groupBy.isEmpty()) {
             for (Object[] ls1 : this) {
                 for (Object[] ls2 : lines) {
