@@ -18,6 +18,7 @@ public class CSVFinder {
     }
 
     public List<Object[]> findLinesWithIds(List<Integer> ids) {
+        System.out.println("DODO");
         List<Object[]> res = new ArrayList<Object[]>();
         Object[] trip;
         List<Object> tmp;

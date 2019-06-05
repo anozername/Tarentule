@@ -10,7 +10,8 @@ public class Results extends ArrayList<Integer> {
 
     public Results(List<Integer> l) {
         super();
-        addAll(l);
+        System.out.println(l);
+        if (l != null) addAll(l);
     }
 
     public void addAllList(List<List<Integer>> list) {

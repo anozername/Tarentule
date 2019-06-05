@@ -22,7 +22,8 @@ public class Index {
     }
     
     public MultivaluedMap<Object, Integer> findInHashMap(String attribute) {
-    	return hashmap.get(attribute);
+        System.out.println(hashmap + " " + attribute);
+        return hashmap.get(attribute);
     }
 
     public Lines getWithoutIndexGroupBy(Map<String, Object> queries, List<String> groupBy, int compute) {
@@ -48,7 +49,8 @@ public class Index {
     }
 
     public List<Integer> getValueWithIndex(String key, Object value) {
-        return findInHashMap(key).get(value);
+        if (findInHashMap(key) != null) return findInHashMap(key).get(value);
+        else return new ArrayList<>();
     }
 
     public List<Object[]> findWithIDS(List<Integer> ids) {

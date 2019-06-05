@@ -168,7 +168,9 @@ public class Parser {
 
                 //ou = 0 et taille = 1 mais pas tout de suite OK
                 if (accCMDS == 2 || (accCMDS == 4 && sel != 0)) {
+                    System.out.println("MMM");
                     resultsLines = getResults();
+                    System.out.println("VA");
                 }
 
                 if (accCMDS < cmds.size()) {
@@ -228,12 +230,15 @@ public class Parser {
             }
             else {
                 tmp = new Results(index.getValueWithIndex(key, query.getValue()));
+                System.out.println("IIIIIIIIIIIII");
             }
             //peut etre set des lines pour recherche ici => creer fct param lines dans csvfinder
             acc++;
         }
         linesTMP.addAll(index.findWithIDS(tmp));
+        System.out.println("OKOK");
         linesTMP.cast();
+        System.out.println("IIIFFFFFFFFFFFFF");
         if (!notIndexTMP.isEmpty()) {
             Map<String, Object> queriesOR = new HashMap<>();
             Map<String, Object> queriesAND= new HashMap<>();
@@ -285,7 +290,7 @@ public class Parser {
         /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
         les 2 queries reoturnent le bon resultat mais ne se computent pas */
         //if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection);
-
+        System.out.println("PPPPP");
         return linesTMP;
     }
 

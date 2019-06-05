@@ -77,7 +77,7 @@ public class Node extends RecursiveTask<Lines> {
         CSVHelper.determineColumnsAndTypes();
         String file_test = "test.csv";
         CSVWriter writer = new CSVWriter(file_test);
-        writer.writeCSVFile(beginning, ending);
+        writer.writeCSVFile(beginning, ending-1);
         main.app.core.search.CSVReader reader = new main.app.core.search.CSVReader(file_test);
         main.app.core.entity.Index index = new Index(file_test, reader.readForIndexing());
         Parser parser = new Parser(index);
