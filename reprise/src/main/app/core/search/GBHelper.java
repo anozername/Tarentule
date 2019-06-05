@@ -26,12 +26,10 @@ public class GBHelper {
     }
 
     public static int to(Integer affinity, Object[] line, List<Object[]> res, int from, int to) {
-        int i = from;
-        while (i < to && line[affinity].equals(res.get(i)[affinity])) {
-            i++;
+        while (from < to && line[affinity].equals(res.get(from)[affinity])) {
+            from++;
         }
-        if (i == from) return from;
-        else return i;
+        return from;
     }
 
     public static int toDoubleVersion(Integer affinity, Object[] line, List<Object[]> res, int from, int to) {
