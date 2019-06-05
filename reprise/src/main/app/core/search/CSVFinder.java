@@ -36,22 +36,18 @@ public class CSVFinder {
         return linesTMP;
     }
 
-    public List<Object[]> getValueWithoutIndex(Map<String, Object> queries, int compute){
+    public List<Object[]> getValueWithoutIndex(Map<String, Object> queriesAND, Map<String, Object> queriesOR){
         List<Object[]> res = new ArrayList<>();
         boolean satisfaction;
         String lineSTR;
         List<Object> line;
-        int line_nb = 50000;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             while ((lineSTR = br.readLine()) != null) {
-                if (line_nb >= 50000) {
-                    line = CSVHelper.read(lineSTR.split(cvsSplitBy));
-                    satisfaction = getSatisfaction(queries, line.toArray(), compute);
-                    if (satisfaction) {
-                        res.add(line.toArray());
-                    }
+                line = CSVHelper.read(lineSTR.split(cvsSplitBy));
+                satisfaction = getSatisfaction(queriesAND, queriesOR, line.toArray());
+                if (satisfaction) {
+                    res.add(line.toArray());
                 }
-                line_nb++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -60,11 +56,11 @@ public class CSVFinder {
         return res;
     }
 
-    public List<Object[]> getValueWithoutIndex(Map<String, Object> queries, List<Object[]> lines, int compute){
+    public List<Object[]> getValueWithoutIndex(Map<String, Object> queriesAND, Map<String, Object> queriesOR, List<Object[]> lines){
         List<Object[]> res = new ArrayList<>();
         boolean satisfaction;
         for (Object[] line : lines) {
-                satisfaction = getSatisfaction(queries, line, compute);
+                satisfaction = getSatisfaction(queriesAND, queriesOR, line);
                 if (satisfaction) {
                     res.add(line);
                 }
@@ -73,7 +69,7 @@ public class CSVFinder {
         return res;
     }
 
-    public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queries, List<String> groupBy, List<Object[]> lines, int compute){
+    public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queriesAND, Map<String, Object> queriesOR, List<String> groupBy, List<Object[]> lines){
         System.out.println("OK");
         List<Object[]> res = new ArrayList<>();
         List<Integer> indicesGroup = new ArrayList<>();
@@ -82,7 +78,7 @@ public class CSVFinder {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
         for (Object[] line : lines) {
-            satisfaction = getSatisfaction(queries, line, compute);
+            satisfaction = getSatisfaction(queriesAND, queriesOR, line);
             if (satisfaction) {
                 System.out.println(GBHelper.placeToInsert(indicesGroup, line, res) + "ok");
                 res.add(GBHelper.placeToInsert(indicesGroup, line, res), line);
@@ -92,7 +88,7 @@ public class CSVFinder {
         return res;
     }
 
-    public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queries, List<String> groupBy, int compute){
+    public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queriesAND, Map<String, Object> queriesOR, List<String> groupBy){
         List<Object[]> res = new ArrayList<>();
         List<Integer> indicesGroup = new ArrayList<>();
         boolean satisfaction;
@@ -106,7 +102,7 @@ public class CSVFinder {
             while ((lineSTR = br.readLine()) != null) {
 
                 line = CSVHelper.read(lineSTR.split(cvsSplitBy));
-                satisfaction = getSatisfaction(queries, line.toArray(), compute);
+                satisfaction = getSatisfaction(queriesAND, queriesOR, line.toArray());
 
                 if (satisfaction) {
                    // System.out.println(GBHelper.placeToInsert(indicesGroup, line.toArray(), res) + "ok\n" + res);
@@ -119,24 +115,21 @@ public class CSVFinder {
         return res;
     }
 
-    public static boolean getSatisfaction(Map<String, Object> queries, Object[] line, int compute) {
+    public static boolean getSatisfaction(Map<String, Object> queriesAND, Map<String, Object> queriesOR, Object[] line) {
         int satisfaction = 0;
-        String[] splitentry;
-        for (Map.Entry<String, Object> querie : queries.entrySet()) {
-            if (compute == 2) {
-                if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
-                    return true;
-                }
-            }
-            if (compute == 1) {
-                if (line[CSVHelper.getNameIndexes().indexOf(querie.getKey())].equals(querie.getValue())) {
-                    satisfaction++;
-                }
-                else {
-                    break;
-                }
+        boolean or = false;
+        for (Map.Entry<String, Object> querieAND : queriesAND.entrySet()) {
+            if (line[CSVHelper.getNameIndexes().indexOf(querieAND.getKey())].equals(querieAND.getValue())) {
+                satisfaction++;
+            } else {
+                break;
             }
         }
-        return satisfaction == queries.size();
+        for (Map.Entry<String, Object> querieOR : queriesOR.entrySet()) {
+            if (line[CSVHelper.getNameIndexes().indexOf(querieOR.getKey())].equals(querieOR.getValue())) {
+                or = true;
+            }
+        }
+        return ((satisfaction == queriesAND.size()) || or);
     }
 }

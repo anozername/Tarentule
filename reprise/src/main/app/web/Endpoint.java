@@ -1,6 +1,5 @@
 package main.app.web;
 
-import main.app.core.entity.Account;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -24,14 +23,6 @@ public class Endpoint {
 	public List<String> getListInParams(@QueryParam("ids") List<String> ids) {
 		System.out.println(ids);
 		return ids;
-	}
-
-	@POST
-	@Path("/entity")
-	public Account getAccount(Account account) {
-		System.out.println("Received account " + account);
-		account.setUpdated(System.currentTimeMillis());
-		return account;
 	}
 
 	@GET

@@ -4,7 +4,6 @@ import main.app.web.Endpoint;
 import main.app.core.filter.GsonProvider;
 import main.app.web.Engine;
 import main.app.web.Index;
-
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;

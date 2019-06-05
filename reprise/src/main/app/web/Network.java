@@ -28,7 +28,7 @@ public class Network {
     @Path("/list")
     @Produces(MediaType.TEXT_HTML)
     public String list() {
-        return Main.externalNodes.toString();
+        return Main.neighborhood.keySet().toString();
     }
 
     @GET
@@ -38,7 +38,7 @@ public class Network {
         int max_processor = 0;
         long max_heap = 0;
 
-        for (String externalAddresses : Main.externalNodes){
+        for (String externalAddresses : Main.neighborhood.keySet()){
             try {
                 JSONObject response = new JSONObject(Unirest.get("http://"+externalAddresses+"/test/network").asJson().getBody().getObject().toString());
                 max_processor += response.getLong("processor");
