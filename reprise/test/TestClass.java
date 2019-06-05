@@ -24,12 +24,12 @@ public class TestClass {
 
     @After
     public void after() throws Exception {
-        Main.externalNodes = new ArrayList<>(); // reset
+        //Main.neighborhood.keySet() = new ArrayList<>(); // reset
     }
 
     @org.junit.Test
     public void testEndPoint() throws Exception {
-        for (String externalAddresses : Main.externalNodes) {
+        for (String externalAddresses : Main.neighborhood.keySet()) {
             Assert.assertEquals(  "{\"app\":\"RESTFUL API - java index\",\"response\":true,\"id\":\"intellij\"}",
                                     Unirest.get("http://" + externalAddresses + "/test/api/json").asJson().getBody().getObject().toString()+""
             );

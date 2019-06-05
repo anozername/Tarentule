@@ -12,7 +12,7 @@ import org.json.JSONObject;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class Index {
-    private Parser parser;
+    private static   Parser parser;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
@@ -36,23 +36,21 @@ public class Index {
     }
 
     @GET
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/insert")
-    public String insert() {
-        //insertion_test();
-        return "insert pas ok";
+    public Response insert(@QueryParam("beginning") int beginning, @QueryParam("ending") int ending) {
+        insertion_test(beginning, ending);
+        return Response.status(Response.Status.OK).entity(new ResponseQuery("insertion ok")).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/find")
-    public Response getIndex(@FormParam("beginning") int beginning, @FormParam("query") String query, @FormParam("ending") int ending) {
-        insertion_test(beginning, ending);
+    public Response getIndex(@FormParam("query") String query) {
+        System.out.println("find :'"+query+"'");
         String result = parser.parse(query);
-        //return result;
-        //return lines.toString();
-        return Response.status(Response.Status.OK).entity(new ResponseQuery(result)).build();
 
+        return Response.status(Response.Status.OK).entity(new ResponseQuery(result)).build();
     }
 
 
@@ -70,7 +68,9 @@ public class Index {
         CSVWriter writer = new CSVWriter(file);
         writer.writeCSVFile(beginning, ending-1);
         CSVReader reader = new CSVReader(file);
+        System.out.println("a");
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
+        System.out.println("a");
         parser = new Parser(index);
     }
 

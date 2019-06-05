@@ -257,20 +257,23 @@ public class Parser {
                 }
             }
             if (acc != 1) {
-                if (!queriesAND.isEmpty()) {
+                if (linesTMP.isEmpty() && indexTMP.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy);
+                else linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy, linesTMP).computeResults(linesTMP, 1);
+              /*  if (!queriesAND.isEmpty()) {
                     linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1, linesTMP).computeResults(linesTMP, 1);
                 }
                 if (!queriesOR.isEmpty()) {
                     linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
-                }
+                } */
             }
             else {
-                if (!queriesAND.isEmpty()){
+                linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy);
+               /* if (!queriesAND.isEmpty()){
                     linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1);
                 }
                 if (!queriesOR.isEmpty()){
                     linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
-                }
+                }*/
             }
             acc++;
         }

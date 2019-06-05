@@ -22,7 +22,6 @@ public class CSVReader {
     }
 
     public HashMap<String, MultivaluedMap<Object, Integer>> readForIndexing() {
-
         List<Integer> posIndex = new ArrayList<>();
         Integer valueTMP;
         ArrayList<Integer> scoresTMP;
@@ -43,30 +42,35 @@ public class CSVReader {
                         }
                     }
                 }
+                System.out.println("b");
                 tmp.clear();
                 deleteFatMap();
+                System.out.println("?M");
             }
+            System.out.println("WHAT");
             ArrayList<Integer> scores = new ArrayList<>(getScoresForIndexing());
+            System.out.println("FFFFF");
             scores.add(0, null);
             scoresTMP = new ArrayList<>(scores);
             Integer min;
             Integer indexmin;
+            System.out.println("FFFFF");
             Integer position;
             for (int nbIndex = 0; nbIndex < 2; nbIndex++) {
                 min = min(scoresTMP);
                 indexmin = scores.indexOf(min);
                 while (posIndex.contains(indexmin)) {
+                    System.out.println("UUUU");
                     position = indexmin;
                     indexmin = scores.indexOf(min(scores.subList(position + 1, scores.size()))) + position;
                 }
                 posIndex.add(indexmin);
                 scoresTMP.remove(min);
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("WHAT");
         return readForHashMap(posIndex);
     }
 
@@ -102,6 +106,7 @@ public class CSVReader {
         String cvsSplitBy = ",";
         MultivaluedMap<Object, Integer> htmp;
         HashMap<String, MultivaluedMap<Object, Integer>> index = new HashMap<>();
+        System.out.println("b");
         for (Integer indice : listIndex) {
             index.put(CSVHelper.getNameIndexes().get(indice), new MultivaluedHashMap<>());
         }
@@ -109,6 +114,7 @@ public class CSVReader {
             while ((line = br.readLine()) != null) {
                 trip = line.split(cvsSplitBy);
                 tmp = new ArrayList<>(CSVHelper.read(trip));
+                System.out.println("WT");
                 for (Integer indice : listIndex) {
                     htmp = index.get(CSVHelper.getNameIndexes().get(indice));
                     if (htmp.containsKey(tmp.get(listIndex.get(acc)))) {
@@ -123,23 +129,23 @@ public class CSVReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("WDDDD");
         return index;
 
     }
 
     public List<Integer> getScoresForIndexing() {
         ArrayList<Integer> scores = new ArrayList<>();
-        int max = -1;
-        int min = -1;
+        int max, min;
         for (int ind = 1; ind < indexes.length; ind++) {
             if (indexes[ind] != null) {
+                max = new ArrayList<>(indexes[ind].values()).get(0);
+                min = new ArrayList<>(indexes[ind].values()).get(0);
                 for (Integer nbIds : indexes[ind].values()) {
                     if (max < nbIds) max = nbIds;
                     if (min > nbIds) min = nbIds;
                 }
                 scores.add(indexes[ind].size() + (max - min));
-                max = -1;
-                min = -1;
             } else scores.add(null);
         }
         return scores;

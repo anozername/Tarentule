@@ -11,15 +11,7 @@ public class Lines extends ArrayList<Object[]> {
     private static Object[] nameIndex;
     private static Object[] types;
 
-    public Lines(Integer[] posIndex, Object[] nameIndex, List<Object[]> lines, Object[] types) {
-        super();
-        this.posIndex = posIndex;
-        this.nameIndex = nameIndex;
-        this.types = types;
-        this.addAll(lines);
-    }
-
-    public Lines(List<Object[]> list) {
+    Lines(List<Object[]> list) {
         super();
         this.addAll(list);
     }
@@ -30,7 +22,6 @@ public class Lines extends ArrayList<Object[]> {
 
     //like an ORGB but not
     public Lines compute(Lines lines, List<String> groupBy) {
-
         Lines res = new Lines();
         List<Integer> indicesGroup = new ArrayList<>();
         res.addAll(this);
@@ -38,8 +29,12 @@ public class Lines extends ArrayList<Object[]> {
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
-        if (this.isEmpty()) return lines.toGB(indicesGroup);
-        if (lines.isEmpty()) return this.toGB(indicesGroup);
+        if (this.isEmpty()){
+            return lines.toGB(indicesGroup);
+        }
+        if (lines.isEmpty()) {
+            return this.toGB(indicesGroup);
+        }
         for (Object[] line : lines) {
             acc = GBHelper.placeToInsert(indicesGroup, line, res);
             res.add(acc, line);
@@ -62,39 +57,12 @@ public class Lines extends ArrayList<Object[]> {
             acc++;
         }
     }
-
-    public Integer[] getPosIndex() {
-        return posIndex;
-    }
-
-    public int getPosID() {
-        return posID;
-    }
-
-    public Object[] getNameIndex() {
-        return nameIndex;
-    }
-
-    public Object[] getTypes() {
-        return types;
-    }
-
-    public static int getPosNameIndex(Object name) {
-        for (int i = 0; i < nameIndex.length; i++) {
-            if (name.equals(nameIndex[i])) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     /********************************************************		insert		*/
 
     public void setLines(List<Object[]> lines) {
         this.clear();
         this.addAll(lines);
     }
-
     /********************************************************		find		*/
 
     public Lines AND(Lines lines, List<String> groupBy) {
@@ -108,7 +76,9 @@ public class Lines extends ArrayList<Object[]> {
                         res.add(ls1);
                         break;
                     }
-                    if (compare < 0) break;
+                    if (compare < 0) {
+                        break;
+                    }
                 }
             }
         }
@@ -131,11 +101,15 @@ public class Lines extends ArrayList<Object[]> {
     }
 
     public Lines OR(Lines lines, List<String> groupBy) {
-        if (groupBy.isEmpty()) return OR(lines);
-        else return ORGB(lines, groupBy);
+        if (groupBy.isEmpty()) {
+            return OR(lines);
+        }
+        else {
+            return ORGB(lines, groupBy);
+        }
     }
 
-    public Lines ORGB(Lines lines, List<String> groupBy) {
+    private Lines ORGB(Lines lines, List<String> groupBy) {
         Lines res = new Lines();
         List<Integer> indicesGroup = new ArrayList<>();
         res.addAll(this);
@@ -143,8 +117,12 @@ public class Lines extends ArrayList<Object[]> {
         for (String attribute : groupBy) {
             indicesGroup.add(CSVHelper.getNameIndexes().indexOf(attribute));
         }
-        if (this.isEmpty()) return lines.toGB(indicesGroup);
-        if (lines.isEmpty()) return this.toGB(indicesGroup);
+        if (this.isEmpty()) {
+            return lines.toGB(indicesGroup);
+        }
+        if (lines.isEmpty()) {
+            return this.toGB(indicesGroup);
+        }
         for (Object[] line : lines) {
             if (!rechercheDicho((Integer) line[posID])) {
                 acc = GBHelper.placeToInsert(indicesGroup, line, res);
@@ -154,7 +132,7 @@ public class Lines extends ArrayList<Object[]> {
         return res;
     }
 
-    public Lines toGB(List<Integer> indicesGroup) {
+    private Lines toGB(List<Integer> indicesGroup) {
         Lines res = new Lines();
         int acc;
         for (Object[] line : this) {
@@ -164,11 +142,15 @@ public class Lines extends ArrayList<Object[]> {
         return res;
     }
 
-    public Lines OR(Lines lines) {
+    private Lines OR(Lines lines) {
         Lines res = new Lines();
         res.addAll(this);
-        if (this.isEmpty()) return lines;
-        if (lines.isEmpty()) return this;
+        if (this.isEmpty()) {
+            return lines;
+        }
+        if (lines.isEmpty()) {
+            return this;
+        }
         for (Object[] line : lines) {
             if (!rechercheDicho((Integer)line[posID])) res.add(line);
         }
