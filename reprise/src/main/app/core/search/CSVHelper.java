@@ -69,9 +69,6 @@ public class CSVHelper {
     }
 
     public static void determineColumnsAndTypes() {
-        List<Integer> posIndex = new ArrayList<>();
-        HashMap<Object, Integer> mapTMP = new HashMap<>();
-        Object valTMP;
         String line = "";
         String cvsSplitBy = ",";
         List<Object> tmp;
@@ -79,18 +76,13 @@ public class CSVHelper {
             line = "id," + br.readLine();
             String[] trip = line.split(cvsSplitBy);
             nameIndexes = new ArrayList<String>(Arrays.asList(trip));
-
             if ((line = br.readLine()) != null) {
                 line = 1 + "," + line;
                 trip = line.split(cvsSplitBy);
-                indexes = new HashMap[trip.length];
                 tmp = new ArrayList<>(Arrays.asList(trip));
                 for (int i=0; i<trip.length; i++) {
-                    valTMP = casting(trip[i], i);
-                    tmp.set(i, valTMP);
-                    indexes[i] = new HashMap<>();
+                    tmp.set(i, casting(trip[i], i));
                 }
-                //res.add(tmp.toArray());
                 tmp.clear();
             }
         } catch (IOException e) {

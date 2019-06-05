@@ -16,10 +16,8 @@ public class GBHelper {
         double v1 = 1.0;
         double v2 = 0.0;
         while (from < to && v1 > v2) {
-            if (line[affinity] instanceof Integer) v1 = (double)((Integer)line[affinity]).intValue();
-            else v1 = (Double)line[affinity];
-            if (res.get(from)[affinity] instanceof Integer) v2 = (double)((Integer)res.get(from)[affinity]).intValue();
-            else v2 = (Double)res.get(from)[affinity];
+            v1 = CastHelper.castToCompare(line[affinity]);
+            v2 = CastHelper.castToCompare(res.get(from)[affinity]);
             from++;
 
         }
@@ -43,10 +41,8 @@ public class GBHelper {
             return from;
         }
         while (from < to && v1 == v2) {
-            if (line[affinity] instanceof Integer) v1 = (double)((Integer)line[affinity]).intValue();
-            else v1 = (Double)line[affinity];
-            if (res.get(from)[affinity] instanceof Integer) v2 = (double)((Integer)res.get(from)[affinity]).intValue();
-            else v2 = (Double)res.get(from)[affinity];
+            v1 = CastHelper.castToCompare(line[affinity]);
+            v2 = CastHelper.castToCompare(res.get(from)[affinity]);
             from++;
         }
         return from;

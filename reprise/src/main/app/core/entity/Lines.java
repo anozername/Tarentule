@@ -183,15 +183,6 @@ public class Lines extends ArrayList<Object[]> {
         return toGB(indicesGroup);
     }
 
-    public int getPosName(String name) {
-        for (int i = 0; i < nameIndex.length; i++) {
-            if (name.equals(nameIndex[i].toString())) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public Lines getLinesWithSelect(List<String> selection) {
         if (selection.size() == 1 && selection.get(0).equals("*")) {
             return this;
@@ -260,7 +251,7 @@ public class Lines extends ArrayList<Object[]> {
         return l;
     }
 
-    public Lines getMaxWithSelect(String selection) {
+   /* public Lines getMaxWithSelect(String selection) {
         Object[] selectLine = get(0);
         Lines l = new Lines();
         int pos;
@@ -277,7 +268,7 @@ public class Lines extends ArrayList<Object[]> {
         }
         l.add(selectLine);
         return l;
-    }
+    }*/
 
 
     //@IDEA peut etre rechercher a partir de sublines a chaque fois car ids donnés dans l'ordre

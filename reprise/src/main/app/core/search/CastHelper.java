@@ -24,6 +24,11 @@ public class CastHelper {
         }
     }
 
+    public static double castToCompare(Object val) {
+        if (val instanceof Integer) return (double)((Integer)val).intValue();
+        else return (Double)val;
+    }
+
     public static Optional<Integer> castToInteger(String data) {
         try {
             return Optional.of(Integer.parseInt(data,10));
