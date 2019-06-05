@@ -61,10 +61,10 @@ public class CSVFinder {
         List<Object[]> res = new ArrayList<>();
         boolean satisfaction;
         for (Object[] line : lines) {
-                satisfaction = getSatisfaction(queriesAND, queriesOR, line);
-                if (satisfaction) {
-                    res.add(line);
-                }
+            satisfaction = getSatisfaction(queriesAND, queriesOR, line);
+            if (satisfaction) {
+                res.add(line);
+            }
         }
 
         return res;
@@ -81,7 +81,7 @@ public class CSVFinder {
         for (Object[] line : lines) {
             satisfaction = getSatisfaction(queriesAND, queriesOR, line);
             if (satisfaction) {
-                System.out.println(GBHelper.placeToInsert(indicesGroup, line, res) + "ok");
+                //System.out.println(GBHelper.placeToInsert(indicesGroup, line, res) + "ok");
                 res.add(GBHelper.placeToInsert(indicesGroup, line, res), line);
             }
         }
@@ -116,7 +116,7 @@ public class CSVFinder {
         return res;
     }
 
-    public static boolean getSatisfaction(Map<String, Object> queriesAND, Map<String, Object> queriesOR, Object[] line) {
+    private static boolean getSatisfaction(Map<String, Object> queriesAND, Map<String, Object> queriesOR, Object[] line) {
         int satisfaction = 0;
         boolean or = false;
         for (Map.Entry<String, Object> querieAND : queriesAND.entrySet()) {

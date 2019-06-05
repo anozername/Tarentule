@@ -14,7 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 /**
- * Created by pitton on 2017-02-21.
+ * Created by pitton on 2020-02-30.
  */
 @Provider
 public class GsonProvider implements MessageBodyWriter<Object>, MessageBodyReader<Object> {

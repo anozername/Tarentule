@@ -1,13 +1,10 @@
 package main.app.core.search;
-import main.Main;
 
-import java.io.FileReader;
+import main.Main;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.BufferedReader;
 import java.util.Iterator;
 import java.util.stream.Stream;
 

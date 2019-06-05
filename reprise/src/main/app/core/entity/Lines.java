@@ -231,11 +231,21 @@ public class Lines extends ArrayList<Object[]> {
         double val2;
         if ((pos = CSVHelper.getNameIndexes().indexOf(selection)) != -1 && CSVHelper.getTypes().get(pos).equals("double")) {
             for (Object[] line : this) {
-                if (selectLine[pos] instanceof Integer) val1 = (double)((Integer)selectLine[pos]).intValue();
-                else val1 = (Double)selectLine[pos];
-                if (line[pos] instanceof Integer) val2 = (double)((Integer)line[pos]).intValue();
-                else val2= (Double)line[pos];
-                if (val1 > val2) selectLine = line;
+                if (selectLine[pos] instanceof Integer) {
+                    val1 = (double)((Integer)selectLine[pos]).intValue();
+                }
+                else {
+                    val1 = (Double)selectLine[pos];
+                }
+                if (line[pos] instanceof Integer) {
+                    val2 = (double)((Integer)line[pos]).intValue();
+                }
+                else {
+                    val2= (Double)line[pos];
+                }
+                if (val1 > val2) {
+                    selectLine = line;
+                }
             }
         }
         l.add(selectLine);
@@ -250,11 +260,21 @@ public class Lines extends ArrayList<Object[]> {
         double val2;
         if ((pos = CSVHelper.getNameIndexes().indexOf(selection)) != -1 && CSVHelper.getTypes().get(pos).equals("double")) {
             for (Object[] line : this) {
-                if (selectLine[pos] instanceof Integer) val1 = (double)((Integer)selectLine[pos]).intValue();
-                else val1 = (Double)selectLine[pos];
-                if (line[pos] instanceof Integer) val2 = (double)((Integer)line[pos]).intValue();
-                else val2= (Double)line[pos];
-                if (val1 < val2) selectLine = line;
+                if (selectLine[pos] instanceof Integer){
+                    val1 = (double)((Integer)selectLine[pos]).intValue();
+                }
+                else {
+                    val1 = (Double)selectLine[pos];
+                }
+                if (line[pos] instanceof Integer){
+                    val2 = (double)((Integer)line[pos]).intValue();
+                }
+                else {
+                    val2= (Double)line[pos];
+                }
+                if (val1 < val2) {
+                    selectLine = line;
+                }
             }
         }
         l.add(selectLine);
@@ -263,7 +283,7 @@ public class Lines extends ArrayList<Object[]> {
 
 
     //@IDEA peut etre rechercher a partir de sublines a chaque fois car ids donnés dans l'ordre
-    public boolean rechercheDicho(Integer val) {
+    private boolean rechercheDicho(Integer val) {
         /* déclaration des variables locales à la fonction */
         boolean trouve;
         int id;
@@ -288,8 +308,12 @@ public class Lines extends ArrayList<Object[]> {
         }
 
         /* test conditionnant la valeur que la fonction va renvoyer */
-        if (((Integer)get(id)[posID]).equals(val)) return true;
-        else return false;
+        if (((Integer)get(id)[posID]).equals(val)) {
+            return true;
+        }
+        else {
+            return false;
+        }
 
     }
 
@@ -317,35 +341,8 @@ public class Lines extends ArrayList<Object[]> {
         }
         return sb.toString();
     }
-    /*public String toString() {
-        StringBuffer sb = new StringBuffer();
-        /*
-        for (Object[] line : this) {
-            sb.append("[");
-            for (Object e : line) {
-                sb.append(e.toString() + ", ");
-            }
-            sb.append("]");
-            sb.append("\n");
-        }
-
-        for (Iterator<Object[]> iter = this.iterator(); iter.hasNext();) {
-            Object[] line = iter.next();
-            sb.append("[");
-            for (Object e : line) {
-                sb.append(e.toString() + ", ");
-            }
-            sb.append("]");
-            if (iter.hasNext()){
-                sb.append("\n");
-            }
-
-        }
-        return sb.toString();
-    }*/
 
     public Lines computeResults(Lines l, int compute) {
-        //if (l == null) return new ArrayList<>();
         Lines list = new Lines();
         if (compute == 1) {
             for (Object[] iq1 : this) {

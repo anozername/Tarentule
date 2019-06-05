@@ -41,7 +41,9 @@ public class CastHelper {
         }
         if (db.isPresent()) {
             it = CastHelper.castToInteger(data);
-            if (it.isPresent()) return it.get();
+            if (it.isPresent()) {
+                return it.get();
+            }
             return db.get();
         }
         return data;

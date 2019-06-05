@@ -1,7 +1,6 @@
 package main.app.core.search;
 
 import main.Main;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CSVHelper {
-
     private static ArrayList<Integer> posDateTime = new ArrayList<>();
     private static ArrayList<Integer> posDouble = new ArrayList<>();
     private static List<String> nameIndexes;
@@ -19,14 +17,6 @@ public class CSVHelper {
 
     private static HashMap<Object, Integer>[] indexes;
 
-    public static ArrayList<Integer> getPosDateTime() {
-        return posDateTime;
-    }
-
-    public static ArrayList<Integer> getPosDouble() {
-        return posDouble;
-    }
-
     public static List<String> getNameIndexes() {
         return nameIndexes;
     }
@@ -35,7 +25,7 @@ public class CSVHelper {
         return types;
     }
 
-    public static HashMap<Object, Integer>[] getIndexes() {
+    static HashMap<Object, Integer>[] getIndexes() {
         return indexes;
     }
 
@@ -98,20 +88,23 @@ public class CSVHelper {
         }
     }
 
-    public static Object casting(String data, int i) {
+    private static Object casting(String data, int i) {
         Optional<Date> dt = CastHelper.castToDate(data);
         Optional<Double> db = CastHelper.castToDouble(data);
         Optional<Integer> it;
         if (dt.isPresent()) {
             posDateTime.add(i);
             types.add("date");
+
             return dt.get();
         }
         if (db.isPresent()) {
             posDouble.add(i);
             types.add("double");
             it = CastHelper.castToInteger(data);
-            if (it.isPresent()) return it.get();
+            if (it.isPresent()) {
+                return it.get();
+            }
             return db.get();
         }
         types.add("string");

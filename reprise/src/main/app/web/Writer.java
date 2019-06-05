@@ -1,7 +1,5 @@
 package main.app.web;
 
-import main.app.core.search.CSVWriter;
-
 public class Writer {
 
     public static void main(String[] args) {

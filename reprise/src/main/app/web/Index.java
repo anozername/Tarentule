@@ -12,13 +12,12 @@ import org.json.JSONObject;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class Index {
-    private static   Parser parser;
+    private static Parser parser;
 
     @GET
     @Produces(MediaType.TEXT_HTML)
     public String string(@QueryParam("query") String query) throws Exception{
         LoadBalancer loadBalancer = new LoadBalancer();
-        System.out.println("query :'"+query+"'");
         String result = loadBalancer.distribute(query);
         System.out.println(result);
 
@@ -39,6 +38,7 @@ public class Index {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/insert")
     public Response insert(@QueryParam("beginning") int beginning, @QueryParam("ending") int ending) {
+        System.out.println("indexing from '"+beginning+"' to '"+ending+"'");
         insertion_test(beginning, ending);
         return Response.status(Response.Status.OK).entity(new ResponseQuery("insertion ok")).build();
     }
@@ -68,9 +68,7 @@ public class Index {
         CSVWriter writer = new CSVWriter(file);
         writer.writeCSVFile(beginning, ending-1);
         CSVReader reader = new CSVReader(file);
-        System.out.println("a");
         main.app.core.entity.Index index = new main.app.core.entity.Index(file, reader.readForIndexing());
-        System.out.println("a");
         parser = new Parser(index);
     }
 

@@ -24,11 +24,7 @@ public class Parser {
         return groupBy;
     }
 
-    public static List<String> getSelection() {
-        return selection;
-    }
-
-    public void groupBy(List<String[]> cmds) {
+    private void groupBy(List<String[]> cmds) {
         for (String[] cmd : cmds) {
             for (int i = 0; i < cmd.length ; i++) {
                 if (cmd[i].equals("GROUPBY")) {
@@ -195,10 +191,9 @@ public class Parser {
                 }
             }
         }
-
         Gson gson = new Gson();
+
         return gson.toJson(resultsLines);
-        //return resultsLines.toString();
     }
 
     public Lines getResults() {
@@ -230,15 +225,11 @@ public class Parser {
             }
             else {
                 tmp = new Results(index.getValueWithIndex(key, query.getValue()));
-                System.out.println("IIIIIIIIIIIII");
             }
-            //peut etre set des lines pour recherche ici => creer fct param lines dans csvfinder
             acc++;
         }
         linesTMP.addAll(index.findWithIDS(tmp));
-        System.out.println("OKOK");
         linesTMP.cast();
-        System.out.println("IIIFFFFFFFFFFFFF");
         if (!notIndexTMP.isEmpty()) {
             Map<String, Object> queriesOR = new HashMap<>();
             Map<String, Object> queriesAND= new HashMap<>();
@@ -252,55 +243,38 @@ public class Parser {
                             queriesOR.put(splitentry[1], query.getValue());
                             break;
                     }
-                } else {
+                }
+                else {
                     queriesAND.put(query.getKey(), query.getValue());
                 }
             }
             if (acc != 1) {
-                if (linesTMP.isEmpty() && indexTMP.isEmpty()) linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy);
-                else linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy, linesTMP).computeResults(linesTMP, 1);
-              /*  if (!queriesAND.isEmpty()) {
-                    linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1, linesTMP).computeResults(linesTMP, 1);
+                if (linesTMP.isEmpty() && indexTMP.isEmpty()) {
+                    linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy);
                 }
-                if (!queriesOR.isEmpty()) {
-                    linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
-                } */
+                else {
+                    linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy, linesTMP).computeResults(linesTMP, 1);
+                }
             }
             else {
                 linesTMP = index.getWithoutIndexGroupBy(queriesAND, queriesOR, groupBy);
-               /* if (!queriesAND.isEmpty()){
-                    linesTMP = index.getWithoutIndexGroupBy(queriesAND, groupBy, 1);
-                }
-                if (!queriesOR.isEmpty()){
-                    linesTMP = index.getWithoutIndexGroupBy(queriesOR, groupBy, 2).computeResults(linesTMP, 2);
-                }*/
             }
             acc++;
         }
         else {
-
-           /* dans le cas ou toutes les recherches sont indexees
-            il faut donc formater le resultat par les attributs du grouby
-            @TODO regarder si les recherches portent egalement sur le groupby = ne rien faire
-
-            */
-
             if (!groupBy.isEmpty()) {
                 linesTMP = linesTMP.getLinesFormatted(groupBy);
             }
         }
-        //return linesTMP.toString();
-        /*return index.getWithoutIndexGroupBy(notIndexTMP, groupBy).toString();
-        les 2 queries reoturnent le bon resultat mais ne se computent pas */
-        //if (!selection.isEmpty()) return linesTMP.getLinesWithSelect(selection);
-        System.out.println("PPPPP");
         return linesTMP;
     }
 
     public void pushCommand(String cmd, Object value) {
         String[] splitentry;
         String command = cmd;
-        if ((splitentry = cmd.split("[ ]")).length == 2) command = splitentry[1];
+        if ((splitentry = cmd.split("[ ]")).length == 2) {
+            command = splitentry[1];
+        }
 
         if (index.getHashmap().containsKey(command)) {
             indexTMP.put(cmd, value);

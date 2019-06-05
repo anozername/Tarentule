@@ -4,11 +4,11 @@ import java.util.*;
 
 public class Results extends ArrayList<Integer> {
 
-    public Results() {
+    Results() {
         super();
     }
 
-    public Results(List<Integer> l) {
+    Results(List<Integer> l) {
         super();
         System.out.println(l);
         if (l != null) addAll(l);
@@ -18,9 +18,7 @@ public class Results extends ArrayList<Integer> {
         for (List<Integer> l : list) addAll(l);
     }
 
-    //et
-    public Results computeResults(List<Integer> l, int compute)  {
-        //if (l == null) return new ArrayList<>();
+    Results computeResults(List<Integer> l, int compute)  {
         Results list = new Results();
         if (compute == 1) {
             for (Integer iq1 : this) {

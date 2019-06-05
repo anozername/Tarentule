@@ -1,23 +1,20 @@
 package main.app.engine;
 
 import com.google.gson.Gson;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
 import main.app.core.entity.Index;
 import main.app.core.entity.Lines;
 import main.app.core.search.CSVHelper;
 import main.app.core.search.CSVWriter;
 import main.app.core.search.Parser;
-import org.json.JSONObject;
-
-import javax.sound.sampled.Line;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
+
+    /*
+        unfinished
+        internal node
+    */
 
 public class Node extends RecursiveTask<Lines> {
     private Lines result = new Lines();
@@ -27,10 +24,6 @@ public class Node extends RecursiveTask<Lines> {
     private String query;
     private int ending;
 
-    private Node(boolean balanced){
-        this.balanced = balanced;
-        System.out.println(balanced+" nodding..."); // bad pun
-    }
     public Node(boolean balanced, int beginning, String file, String query, int ending){
         this.balanced = balanced;
         this.beginning = beginning;
@@ -101,7 +94,6 @@ public class Node extends RecursiveTask<Lines> {
 
         return result;
     }
-
 
     protected Lines  compute() {
         Lines compute = new Lines();

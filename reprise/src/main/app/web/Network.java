@@ -11,16 +11,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-/**
- * Created by pitton on 2017-02-20.
- */
 @Path("/test/network")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class Network {
     @GET
     public Response network() {
-        //Single
         return Response.status(Response.Status.OK).entity(new ResponseNetwork()).build();
     }
 
@@ -34,7 +30,6 @@ public class Network {
     @GET
     @Path("/benchmark")
     public Response benchmark() {
-        //Total
         int max_processor = 0;
         long max_heap = 0;
 

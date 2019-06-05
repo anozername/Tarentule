@@ -1,6 +1,5 @@
 package main.app.web;
 
-import main.Main;
 import main.app.core.entity.Index;
 import main.app.core.search.*;
 

@@ -5,11 +5,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.util.*;
 
 public class CSVReader {
-
     private String csvFile;
     private HashMap<Object, Integer>[] indexes;
 
@@ -42,25 +40,19 @@ public class CSVReader {
                         }
                     }
                 }
-                System.out.println("b");
                 tmp.clear();
                 deleteFatMap();
-                System.out.println("?M");
             }
-            System.out.println("WHAT");
             ArrayList<Integer> scores = new ArrayList<>(getScoresForIndexing());
-            System.out.println("FFFFF");
             scores.add(0, null);
             scoresTMP = new ArrayList<>(scores);
             Integer min;
             Integer indexmin;
-            System.out.println("FFFFF");
             Integer position;
             for (int nbIndex = 0; nbIndex < 2; nbIndex++) {
                 min = min(scoresTMP);
                 indexmin = scores.indexOf(min);
                 while (posIndex.contains(indexmin)) {
-                    System.out.println("UUUU");
                     position = indexmin;
                     indexmin = scores.indexOf(min(scores.subList(position + 1, scores.size()))) + position;
                 }
@@ -70,23 +62,24 @@ public class CSVReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("WHAT");
         return readForHashMap(posIndex);
     }
 
-    public void deleteFatMap() {
+    private void deleteFatMap() {
         for (int i = 0; i < indexes.length; i++) {
             if (indexes[i] != null) {
-                if (indexes[i].size() > 11) indexes[i] = null;
+                if (indexes[i].size() > 11){
+                    indexes[i] = null;
+                }
             }
         }
     }
 
-    public Integer min(List<Integer> scores) {
+    private Integer min(List<Integer> scores) {
         Integer min = scores.get(0);
-        for (int i = 0; i < scores.size(); i++) {
-            if (scores.get(i) != null) {
-                min = scores.get(i);
+        for (Integer score : scores) {
+            if (score != null) {
+                min = score;
                 break;
             }
         }
@@ -142,11 +135,17 @@ public class CSVReader {
                 max = new ArrayList<>(indexes[ind].values()).get(0);
                 min = new ArrayList<>(indexes[ind].values()).get(0);
                 for (Integer nbIds : indexes[ind].values()) {
-                    if (max < nbIds) max = nbIds;
-                    if (min > nbIds) min = nbIds;
+                    if (max < nbIds) {
+                        max = nbIds;
+                    }
+                    if (min > nbIds) {
+                        min = nbIds;
+                    }
                 }
                 scores.add(indexes[ind].size() + (max - min));
-            } else scores.add(null);
+            } else {
+                scores.add(null);
+            }
         }
         return scores;
     }

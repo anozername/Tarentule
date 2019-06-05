@@ -1,32 +1,23 @@
 package main;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import main.app.core.entity.Lines;
-import main.app.engine.LoadBalancer;
-import main.app.web.Index;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
-
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 import org.apache.commons.cli.*;
 import org.json.JSONObject;
 
 public class Main {
     public static Map<String, JSONObject> neighborhood = new HashMap<>();
     public static String file_path;
-    static int fake_nb_lines = 0;
+    private static int fake_nb_lines = 0;
 
     public static void jetty(int port) {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
@@ -105,8 +96,6 @@ public class Main {
         }
         JSONObject jsonObject = new JSONObject("{\"processor\":"+Runtime.getRuntime().availableProcessors()+",\"heap\":"+Runtime.getRuntime().freeMemory()+"}");
         neighborhood.put("localhost:"+port , jsonObject);
-        // System.out.println(Unirest.get("http://localhost:"+port+"/test/index/insert/beginning="+1+"&ending="+fake_nb_lines).asJson());
-        //System.out.println(Index.insert(1,fake_nb_lines));
 
         return port;
     }
@@ -115,7 +104,6 @@ public class Main {
         int beginning = last+1; //skip line 0 (header) / 1 (usually blank)
 
         int ending = beginning + processors*(fake_nb_lines/max);
-        //TODO check first & last lines
 
         if (ending + fake_nb_lines/max > fake_nb_lines)
             ending = fake_nb_lines;

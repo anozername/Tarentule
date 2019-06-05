@@ -16,37 +16,58 @@ public class GBHelper {
         double v1 = 1.0;
         double v2 = 0.0;
         while (from < to && v1 > v2) {
-            if (line[affinity] instanceof Integer) v1 = (double)((Integer)line[affinity]).intValue();
-            else v1 = (Double)line[affinity];
-            if (res.get(from)[affinity] instanceof Integer) v2 = (double)((Integer)res.get(from)[affinity]).intValue();
-            else v2 = (Double)res.get(from)[affinity];
+            if (line[affinity] instanceof Integer) {
+                v1 = (double)((Integer)line[affinity]).intValue();
+            }
+            else {
+                v1 = (Double)line[affinity];
+            }
+            if (res.get(from)[affinity] instanceof Integer) {
+                v2 = (double)((Integer)res.get(from)[affinity]).intValue();
+            }
+            else {
+                v2 = (Double)res.get(from)[affinity];
+            }
             from++;
-
         }
-        if (from == to && v1 > v2) return from;
+        if (from == to && v1 > v2) {
+            return from;
+        }
         return from-1;
     }
 
-    public static int to(Integer affinity, Object[] line, List<Object[]> res, int from, int to) {
+    private static int to(Integer affinity, Object[] line, List<Object[]> res, int from, int to) {
         int i = from;
         while (i < to && line[affinity].equals(res.get(i)[affinity])) {
             i++;
         }
-        if (i == from) return from;
-        else return i;
+        if (i == from) {
+            return from;
+        }
+        else {
+            return i;
+        }
     }
 
-    public static int toDoubleVersion(Integer affinity, Object[] line, List<Object[]> res, int from, int to) {
+    private static int toDoubleVersion(Integer affinity, Object[] line, List<Object[]> res, int from, int to) {
         double v1 = 0.0;
         double v2 = 0.0;
         if (from == to) {
             return from;
         }
         while (from < to && v1 == v2) {
-            if (line[affinity] instanceof Integer) v1 = (double)((Integer)line[affinity]).intValue();
-            else v1 = (Double)line[affinity];
-            if (res.get(from)[affinity] instanceof Integer) v2 = (double)((Integer)res.get(from)[affinity]).intValue();
-            else v2 = (Double)res.get(from)[affinity];
+            if (line[affinity] instanceof Integer) {
+                v1 = (double)((Integer)line[affinity]).intValue();
+            }
+            else {
+                v1 = (Double)line[affinity];
+            }
+            if (res.get(from)[affinity] instanceof Integer) {
+                v2 = (double)((Integer)res.get(from)[affinity]).intValue();
+            }
+            else {
+                v2 = (Double)res.get(from)[affinity];
+            }
             from++;
         }
         return from;
@@ -55,8 +76,9 @@ public class GBHelper {
     public static int placeToInsert(List<Integer> affinities, Object[] line, List<Object[]> res) {
         int from = 0;
         int to = res.size();
-        int acc = from;
-        if (res.isEmpty()) return 0;
+        if (res.isEmpty()) {
+            return 0;
+        }
         for (Integer affinity : affinities) {
             if (CSVHelper.getTypes().get(affinity).equals("double")) {
                 if (from == to) {

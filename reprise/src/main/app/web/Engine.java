@@ -1,22 +1,10 @@
 package main.app.web;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import main.app.core.entity.Lines;
-import main.app.engine.LoadBalancer;
 import main.app.engine.Node;
-import org.json.JSONObject;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
-/**
- * Created by pitton on 2017-02-20.
- */
 @Path("/test/engine")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
