@@ -54,7 +54,7 @@ public class TestClass {
 
     @org.junit.Test
     public void testQuery() throws Exception{
-        JSONObject jsonObject = (JSONObject) new JSONObject(Unirest.get("http://localhost:8080/test/index/json/?query=SELECT%20AVG(passenger_count)%20WHERE%20(store_and_fwd_flag%20=%20M)").asJson().getBody().getObject().toString()).get("localhost:8080");
+        //JSONObject jsonObject = (JSONObject) new JSONObject(Unirest.get("http://localhost:8080/test/index/json/?query=SELECT%20AVG(passenger_count)%20WHERE%20(store_and_fwd_flag%20=%20M)").asJson().getBody().getObject().toString()).get("localhost:8080");
         Assert.assertEquals(  "{\"nb 0\":\"avg :1.0\"}", jsonObject.get("response").toString());
     }
 

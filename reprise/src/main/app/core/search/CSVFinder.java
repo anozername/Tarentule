@@ -18,7 +18,6 @@ public class CSVFinder {
     }
 
     public List<Object[]> findLinesWithIds(List<Integer> ids) {
-        System.out.println("DODO");
         List<Object[]> res = new ArrayList<Object[]>();
         Object[] trip;
         List<Object> tmp;
@@ -71,7 +70,6 @@ public class CSVFinder {
     }
 
     public List<Object[]> getValueWithoutIndexGB(Map<String, Object> queriesAND, Map<String, Object> queriesOR, List<String> groupBy, List<Object[]> lines){
-        System.out.println("OK");
         List<Object[]> res = new ArrayList<>();
         List<Integer> indicesGroup = new ArrayList<>();
         boolean satisfaction;

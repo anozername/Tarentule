@@ -164,9 +164,7 @@ public class Parser {
 
                 //ou = 0 et taille = 1 mais pas tout de suite OK
                 if (accCMDS == 2 || (accCMDS == 4 && sel != 0)) {
-                    System.out.println("MMM");
                     resultsLines = getResults();
-                    System.out.println("VA");
                 }
 
                 if (accCMDS < cmds.size()) {
