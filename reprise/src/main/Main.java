@@ -102,36 +102,43 @@ public class Main {
 
     private static int[] balance(int last, int max, int processors){
         int beginning = last+1; //skip line 0 (header) / 1 (usually blank)
-
+        System.out.println("max lines : "+processors*(fake_nb_lines/max));
         int ending = beginning + processors*(fake_nb_lines/max);
 
-        if (ending + fake_nb_lines/max > fake_nb_lines)
+        if (ending + fake_nb_lines/max > fake_nb_lines) {
             ending = fake_nb_lines;
+            //System.out.println("if : "+ (ending + fake_nb_lines/max));
+        }
 
         return new int[]{beginning, ending};
     }
 
-    private static void addExternalNode(String command){
+    private static void addExternalNode(String command) throws Exception{
         String[] command_splitted = command.split(" ");
         if (command_splitted.length == 1){
             System.out.println("Missing argument : 'addExternalNode <address>'");
         }
         for (int i = 1; i < command_splitted.length;i++) {
             String address_string = command_splitted[i];
-            try {
-                neighborhood.put(address_string , new JSONObject(Unirest.get(address_string+"/test/network").asJson().getBody().getObject().toString()));
-                Unirest.post("http://"+address_string+"/test/index/insert").header("accept", "application/json").field("beginning", 1).field("ending", countLines(file_path)).asJson();
-            }
-            catch (IOException | UnirestException e){
-                //e.printStackTrace();
-                System.out.println("http://"+address_string + " is not a valid node address.");
-            }
+            System.out.println("pif");
+            String response = Unirest.get("http://"+address_string+"/test/network").asJson().getBody().getObject().toString();
+            //System.out.println("json '"+response+"'");
+            JSONObject jsonObject = new JSONObject("{\"heap\":197181440,\"processor\":8}");
+            neighborhood.put(address_string , jsonObject);
         }
+        int max = 0;
+        for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) { //TODO opti
+            max += entry.getValue().getLong("processor");
+        }
+        //System.out.println("total proco : "+max);
         int[] scope = new int[]{0, 0};
         for (Map.Entry<String, JSONObject> entry : neighborhood.entrySet()) {
             try {
-                scope = balance(scope[1], entry.getValue().getInt("processor"), entry.getValue().getInt("processor"));
-                Unirest.post(entry.getKey()+"/test/index/insert").header("accept", "application/json").field("beginning", scope[0]).field("ending", scope[1]).asJson();
+                scope = balance(scope[1], max, entry.getValue().getInt("processor"));
+                System.out.println("entry '"+entry.getKey()+"'");
+                //Unirest.post("http://"+entry.getKey()+"/test/index/insert").header("accept", "application/json").field("beginning", scope[0]).field("ending", scope[1]).asJson();
+                System.out.println(Unirest.get("http://"+entry.getKey()+"/test/index/insert/?beginning="+scope[0]+"&ending="+(scope[1]-1)).asJson().getBody().getObject().toString());
+                //scope = new int[]{scope};
             } catch (UnirestException e) {
                 e.printStackTrace();
             }
@@ -194,7 +201,11 @@ public class Main {
                     System.exit(0);
                     break;
                 case "addExternalNode":
-                    addExternalNode(command);
+                    try {
+                        addExternalNode(command);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     System.out.println("Invalid command");

@@ -50,7 +50,7 @@ public class TestClass {
             Assert.assertEquals("[localhost:8080, localhost:8081]", strTemp+"");
         }
     }
-    */
+
 
     @org.junit.Test
     public void testQuery() throws Exception{

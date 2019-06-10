@@ -21,7 +21,7 @@ public class Engine {
         try {
             HttpResponse<JsonNode> response = future.get();
             String result = response.getBody().getObject().toString();
-            JSONObject jsonObj = new JSONObject(result);
+            JSONObject jsonO    bj = new JSONObject(result);
             response_string += jsonObj.get("result");
         }
         catch (InterruptedException | ExecutionException e) {
